@@ -1,0 +1,60 @@
+<section class="max-w-4xl mx-auto py-16 px-6">
+    <div class="flex flex-col md:flex-row gap-12 mb-12">
+        <div class="md:w-1/3">
+            <h3 class="text-2xl font-display font-bold text-text-dark mb-4">Customer Reviews</h3>
+            <div class="flex items-center gap-4 mb-6">
+                <span class="text-5xl font-display font-bold text-primary">4.8</span>
+                <div>
+                    <div class="flex text-accent">
+                        {% for i in "1234" %}<span class="material-symbols-outlined fill-1">star</span>{% endfor %}
+                        <span class="material-symbols-outlined text-gray-200">star</span>
+                    </div>
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Based on 128 Reviews</p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                {% for star, percent in "5:80,4:15,3:3,2:2,1:0"|split:"," %}
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-gray-400 w-4">{{ star|first }}</span>
+                    <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-accent" style="width: {{ star|slice:'2:' }}%"></div>
+                    </div>
+                    <span class="text-xs font-bold text-gray-400 w-8 text-right">{{ star|slice:'2:' }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <a href="/reviews/add_review/" class="mt-8 block w-full bg-white border-2 border-primary text-primary text-center font-bold py-3 rounded-full hover:bg-primary hover:text-white transition-all shadow-sm">
+                Write a Review
+            </a>
+        </div>
+
+        <div class="flex-1 space-y-8">
+            {% for i in "12" %}
+            <div class="border-b border-gray-100 pb-8 last:border-0">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-background-light flex items-center justify-center font-bold text-primary">JD</div>
+                        <div>
+                            <p class="text-sm font-bold text-text-dark">John Doe</p>
+                            <div class="flex text-accent text-xs">
+                                {% for j in "12345" %}<span class="material-symbols-outlined text-[14px] fill-1">star</span>{% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400">2 weeks ago</span>
+                </div>
+                <h4 class="font-bold text-text-dark mb-2">Exceeded my expectations!</h4>
+                <p class="text-sm text-gray-600 leading-relaxed italic">
+                    "The quality of the leather is incredible. I've been wearing this watch every day and I get compliments constantly. Definitely worth the price."
+                </p>
+                <div class="mt-4 flex items-center gap-4">
+                    <button class="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-primary"><span class="material-symbols-outlined text-sm">thumb_up</span> Helpful (12)</button>
+                    <button class="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-red-500"><span class="material-symbols-outlined text-sm">flag</span> Report</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

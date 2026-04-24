@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Success - Thank You!{% endblock %}
+
+{% block content %}
+<div class="min-h-[75vh] flex items-center justify-center px-4">
+    <div class="max-w-md w-full bg-white rounded-[32px] shadow-card p-10 text-center border border-gray-50 relative overflow-hidden">
+        
+        <div class="absolute top-0 left-0 w-full h-2 flex justify-between gap-1">
+            {% for i in "12345678" %}
+                <div class="h-full w-4 bg-primary/20 animate-bounce" style="animation-delay: {{ forloop.counter0 }}0.1s"></div>
+            {% endfor %}
+        </div>
+
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-50 text-green-600 mb-8 ring-8 ring-green-50/50">
+            <span class="material-symbols-outlined text-4xl">check_circle</span>
+        </div>
+
+        <h1 class="text-3xl font-display font-bold text-text-dark mb-2">Order Confirmed!</h1>
+        <p class="text-sm font-bold text-primary uppercase tracking-widest mb-6">Order #CQ-99201</p>
+        
+        <p class="text-gray-500 mb-8 leading-relaxed px-4">
+            Thank you for your purchase, <span class="font-bold text-text-dark">{{ user.first_name|default:user.username }}</span>! We've sent a confirmation email to <span class="font-medium text-text-dark">{{ user.email }}</span>.
+        </p>
+
+        <div class="bg-gray-50 rounded-2xl p-6 mb-8 text-left border border-gray-100">
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Estimated Delivery</h4>
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary">event_available</span>
+                <p class="text-sm font-bold text-text-dark">Monday, March 23 - Wednesday, March 25</p>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <a href="/orders/" class="block w-full bg-primary hover:bg-secondary text-white font-bold py-4 rounded-full shadow-lg transition-all hover:-translate-y-1">
+                Track My Order
+            </a>
+            <a href="/" class="block w-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold py-4 rounded-full transition-all">
+                Continue Shopping
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

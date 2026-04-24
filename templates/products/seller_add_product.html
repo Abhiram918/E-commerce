@@ -1,0 +1,416 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{% if product %}Edit Product{% else %}Add New Product{% endif %} — Seller Central | CliqMarket{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Kept only the essential custom CSS, moved the rest to Tailwind */
+  .preview-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+  .preview-img { width: 88px; height: 88px; object-fit: cover; border-radius: 12px; border: 1px solid #e5e7eb; position: relative; }
+  .remove-preview { 
+    position: absolute; top: -8px; right: -8px; background: #ef4444; color: #fff;
+    border-radius: 50%; width: 24px; height: 24px; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.1s;
+  }
+  .remove-preview:hover { transform: scale(1.1); }
+  
+  /* Hide scrollbar for cleaner bento textareas */
+  textarea::-webkit-scrollbar { width: 6px; }
+  textarea::-webkit-scrollbar-track { background: transparent; }
+  textarea::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+  /* Sidebar styling */
+  .sidebar-link { transition: all 0.2s ease-in-out; }
+  .sidebar-link:hover, .sidebar-link.active {
+      background-color: #F0F4F0;
+      color: #005F02;
+      font-weight: 600;
+  }
+  .sidebar-link.active { border-left: 4px solid #005F02; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
+
+  <!-- Breadcrumbs -->
+    <nav aria-label="Breadcrumb" class="flex text-sm text-gray-600 mb-6">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+                    <span class="material-symbols-outlined text-sm mr-1">home</span>
+                    Home
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <a class="ml-1 font-medium text-gray-900 hover:text-primary transition-colors md:ml-2" href="{% url 'account:profile' %}">Seller Central</a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <span class="ml-1 font-medium text-gray-500 md:ml-2">{% if product %}Edit Product{% else %}Add Product{% endif %}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+  <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- ── Seller Sidebar ──────────────────────────────────── -->
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-[16px] shadow-sm overflow-hidden sticky top-24">
+                <!-- Store Info -->
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">
+                            {{ request.user.sellerprofile.store_name|default:"S"|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">{{ request.user.sellerprofile.store_name|default:"Your Store" }}</h2>
+                            <p class="text-gray-200 text-sm">Seller ID: #{{ request.user.id }}</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Nav Links -->
+                <nav class="py-2">
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'account:profile' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">dashboard</span>
+                        Dashboard
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'products:seller_products' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">inventory_2</span>
+                        Inventory
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">local_shipping</span>
+                        Orders &amp; Shipping
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">campaign</span>
+                        Advertising
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">payments</span>
+                        Payments
+                    </a>
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'products:add_product' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">post_add</span>
+                        {% if product %}Edit Product{% else %}Add Product{% endif %}
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">store</span>
+                        Store Settings
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-gray-100">
+                    <a href="{% url 'account:logout' %}"
+                       class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+    <div class="flex-1 min-w-0">
+
+      <div class="sticky top-4 z-40 bg-white/80 backdrop-blur-md rounded-[20px] shadow-sm border border-gray-200/60 p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined">{% if product %}edit_square{% else %}add_circle{% endif %}</span>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900 tracking-tight leading-tight">
+              {% if product %}Edit Product{% else %}New Product{% endif %}
+            </h1>
+            <p class="text-xs text-gray-500">{% if product %}Updating existing listing{% else %}Drafting a new catalog item{% endif %}</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <a href="{% url 'products:seller_products' %}" class="px-5 py-2 rounded-[12px] text-sm font-medium text-gray-600 hover:bg-gray-100 transition-all">
+            Discard
+          </a>
+          <button type="submit" form="product-form" class="px-6 py-2 rounded-[12px] bg-primary text-white text-sm font-bold shadow-md shadow-primary/20 hover:bg-primary/90 hover:shadow-lg transition-all focus:ring-2 focus:ring-offset-2 focus:ring-primary active:scale-95">
+            {% if product %}Save Changes{% else %}Publish Product{% endif %}
+          </button>
+        </div>
+      </div>
+
+      {% if messages %}
+      <div class="space-y-3 mb-6">
+        {% for msg in messages %}
+        <div class="flex items-center gap-3 px-4 py-3 rounded-[16px] text-sm font-medium
+          {% if msg.tags == 'success' %}bg-green-50 text-green-800 border border-green-100
+          {% elif msg.tags == 'error' %}bg-red-50 text-red-800 border border-red-100
+          {% else %}bg-blue-50 text-blue-800 border border-blue-100{% endif %}">
+          <span class="material-symbols-outlined text-[20px]">
+            {% if msg.tags == 'success' %}check_circle{% elif msg.tags == 'error' %}error{% else %}info{% endif %}
+          </span>
+          {{ msg }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form id="product-form" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-auto">
+        {% csrf_token %}
+
+        <div class="bg-white rounded-[24px] border border-gray-100 shadow-sm p-6 xl:col-span-2 flex flex-col">
+          <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+            <span class="material-symbols-outlined text-gray-400 text-[20px]">text_fields</span> 
+            Basic Details
+          </h3>
+          <div class="space-y-5 flex-1">
+            <div>
+              <label for="field-name" class="block text-sm font-medium text-gray-700 mb-1.5">
+                Product Name <span class="text-red-500">*</span>
+              </label>
+              <input type="text" name="name" id="field-name" required
+                     value="{% if product %}{{ product.name }}{% endif %}"
+                     placeholder="e.g. Minimalist Leather Watch"
+                     class="w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-[14px] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all">
+            </div>
+            <div class="flex-1 flex flex-col">
+              <label for="field-desc" class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+              <textarea name="description" id="field-desc" rows="6"
+                        placeholder="Describe the features, materials, and details..."
+                        class="w-full flex-1 px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-[14px] placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all resize-none">{% if product %}{{ product.description }}{% endif %}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-[24px] border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
+          <div>
+            <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+              <span class="material-symbols-outlined text-gray-400 text-[20px]">sell</span> 
+              Pricing & Stock
+            </h3>
+            <div class="space-y-5">
+              <div>
+                <label for="field-price" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Actual Price <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span class="text-gray-500 font-medium">$</span>
+                  </div>
+                  <input type="number" step="0.01" min="0" name="price" id="field-price" required
+                         value="{% if product %}{{ product.price }}{% endif %}"
+                         class="w-full pl-8 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-[14px] font-bold text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                </div>
+              </div>
+              <div>
+                <label for="field-discount-price" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Discounted Price
+                </label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span class="text-gray-500 font-medium">$</span>
+                  </div>
+                  <input type="number" step="0.01" min="0" name="discounted_price" id="field-discount-price"
+                         value="{% if product and product.discounted_price %}{{ product.discounted_price }}{% endif %}"
+                         class="w-full pl-8 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-[14px] font-bold text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                </div>
+              </div>
+              <div>
+                <label for="field-stock" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Stock Quantity
+                </label>
+                <input type="number" name="stock" id="field-stock" min="0"
+                       value="{% if product %}{{ product.stock }}{% else %}0{% endif %}"
+                       class="w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-[14px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-[24px] border border-gray-100 shadow-sm p-6 xl:col-start-3 xl:row-start-2">
+          <h3 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+            <span class="material-symbols-outlined text-gray-400 text-[20px]">category</span> 
+            Organization
+          </h3>
+          <div class="space-y-5">
+            <div>
+              <label for="field-category" class="block text-sm font-medium text-gray-700 mb-1.5">
+                Category <span class="text-red-500">*</span>
+              </label>
+              <select name="category" id="field-category" required class="w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-[14px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all appearance-none cursor-pointer">
+                <option value="">Select Category</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if product and product.category_id == cat.id %}selected{% endif %}>
+                  {{ cat.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label for="field-subcategory" class="block text-sm font-medium text-gray-700 mb-1.5">Subcategory</label>
+              <select name="subcategory" id="field-subcategory" class="w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-[14px] focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all appearance-none cursor-pointer">
+                <option value="">None</option>
+                {% for cat in categories %}
+                  {% for sub in cat.subcategories.all %}
+                  <option value="{{ sub.id }}" data-parent="{{ cat.id }}" {% if product and product.subcategory_id == sub.id %}selected{% endif %}>
+                    {{ cat.name }} → {{ sub.name }}
+                  </option>
+                  {% endfor %}
+                {% endfor %}
+              </select>
+            </div>
+            
+            <div class="pt-4 mt-2 border-t border-gray-100">
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="relative flex-shrink-0">
+                  <input type="checkbox" name="is_active" id="field-is-active" class="sr-only peer" {% if not product or product.is_active %}checked{% endif %}>
+                  <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-primary transition-colors border border-gray-300 peer-checked:border-primary"></div>
+                  <div class="absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full shadow-sm peer-checked:translate-x-5 transition-transform"></div>
+                </div>
+                <div>
+                  <span class="block text-sm font-bold text-gray-900 group-hover:text-primary transition-colors">Visible on Store</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-[24px] border border-gray-100 shadow-sm p-6 xl:col-span-2 xl:col-start-1 xl:row-start-2">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
+               <span class="material-symbols-outlined text-gray-400 text-[20px]">image</span> 
+               Product Media
+            </h3>
+          </div>
+
+          {% if product and product.images.all %}
+          <div class="mb-6 p-4 bg-gray-50 rounded-[16px] border border-gray-100">
+            <p class="text-sm font-bold text-gray-700 mb-3">Current Images</p>
+            <div class="flex flex-wrap gap-4">
+              {% for img in product.images.all %}
+              <div class="relative group">
+                <img src="{{ img.image.url }}" alt="Product image" class="w-20 h-20 object-cover rounded-[12px] border border-gray-200 shadow-sm">
+                <label class="absolute inset-0 bg-black/60 rounded-[12px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer backdrop-blur-sm" title="Mark for deletion">
+                  <input type="checkbox" name="delete_images" value="{{ img.id }}" class="sr-only peer">
+                  <span class="material-symbols-outlined text-white text-[24px] peer-checked:text-red-500">delete</span>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <div id="drop-zone" class="border-2 border-dashed border-gray-200 bg-gray-50/50 rounded-[20px] p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 hover:border-primary/50 transition-all group min-h-[160px]" onclick="document.getElementById('img-input').click()">
+            <div class="w-14 h-14 bg-white border border-gray-100 shadow-sm text-gray-400 rounded-full flex items-center justify-center mb-3 group-hover:text-primary group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-[26px]">add_photo_alternate</span>
+            </div>
+            <p class="text-sm font-bold text-gray-900">Click to upload or drag & drop</p>
+            <p class="text-xs text-gray-500 mt-1">Supports PNG, JPG or WebP (Max 5MB)</p>
+            <input id="img-input" type="file" name="images" multiple accept="image/*" class="hidden">
+          </div>
+          <div id="preview-grid" class="preview-grid"></div>
+        </div>
+
+      </form>
+    </div></div></div>{% endblock %}
+
+
+{% block extra_js %}
+<script>
+// ── Subcategory filter ────────────────────────────────────
+var catSelect = document.getElementById('field-category');
+var subSelect = document.getElementById('field-subcategory');
+var allSubOptions = Array.from(subSelect.options);
+
+function filterSubs() {
+  var catId = catSelect.value;
+  var currentVal = subSelect.value;
+  while (subSelect.options.length > 1) subSelect.remove(1);
+  allSubOptions.forEach(function(opt) {
+    if (!opt.value) return; 
+    if (!catId || opt.dataset.parent === catId) {
+      subSelect.add(opt.cloneNode(true));
+    }
+  });
+  subSelect.value = currentVal || '';
+}
+
+catSelect.addEventListener('change', filterSubs);
+filterSubs();
+
+// ── Image drag & drop & preview ──────────────────────────
+var dropZone = document.getElementById('drop-zone');
+var imgInput = document.getElementById('img-input');
+var previewGrid = document.getElementById('preview-grid');
+var filesToUpload = [];
+
+function addFiles(files) {
+  Array.from(files).forEach(function(file) {
+    if (!file.type.startsWith('image/')) return;
+    filesToUpload.push(file);
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var wrapper = document.createElement('div');
+      wrapper.style.cssText = 'position:relative;display:inline-block;';
+      
+      var img = document.createElement('img');
+      img.src = e.target.result;
+      img.className = 'preview-img';
+      
+      var rm = document.createElement('span');
+      rm.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">close</span>';
+      rm.className = 'remove-preview';
+      rm.onclick = function(event) {
+        event.stopPropagation(); 
+        var idx = filesToUpload.indexOf(file);
+        if (idx > -1) filesToUpload.splice(idx, 1);
+        wrapper.remove();
+        syncFileInput();
+      };
+      
+      wrapper.appendChild(img);
+      wrapper.appendChild(rm);
+      previewGrid.appendChild(wrapper);
+    };
+    reader.readAsDataURL(file);
+  });
+  syncFileInput();
+}
+
+function syncFileInput() {
+  try {
+    var dt = new DataTransfer();
+    filesToUpload.forEach(function(f) { dt.items.add(f); });
+    imgInput.files = dt.files;
+  } catch(e) {
+      console.warn("DataTransfer not supported in this browser.");
+  }
+}
+
+dropZone.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  dropZone.classList.add('border-primary', 'bg-primary/5');
+  dropZone.classList.remove('border-gray-200', 'bg-gray-50/50');
+});
+dropZone.addEventListener('dragleave', function() {
+  dropZone.classList.remove('border-primary', 'bg-primary/5');
+  dropZone.classList.add('border-gray-200', 'bg-gray-50/50');
+});
+dropZone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  dropZone.classList.remove('border-primary', 'bg-primary/5');
+  dropZone.classList.add('border-gray-200', 'bg-gray-50/50');
+  addFiles(e.dataTransfer.files);
+});
+imgInput.addEventListener('change', function() {
+  addFiles(imgInput.files);
+});
+</script>
+{% endblock %}

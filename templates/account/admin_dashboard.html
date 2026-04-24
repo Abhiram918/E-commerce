@@ -1,0 +1,423 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Cliq Mart{% endblock %}
+
+{% block extra_css %}
+.admin-sidebar-link { transition: all 0.2s ease-in-out; }
+.admin-sidebar-link:hover, .admin-sidebar-link.active {
+    background-color: #F0F4F0; color: #005F02; font-weight: 600;
+}
+.admin-sidebar-link.active { border-left: 4px solid #005F02; }
+.stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+
+  <!-- Breadcrumbs -->
+  <nav class="flex text-sm text-gray-600 mb-6">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+          <span class="material-symbols-outlined text-sm mr-1">home</span>Home
+        </a>
+      </li>
+      <li><div class="flex items-center">
+        <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+        <span class="ml-1 font-medium text-gray-500 md:ml-2">Admin Dashboard</span>
+      </div></li>
+    </ol>
+  </nav>
+
+  <div class="flex flex-col lg:flex-row gap-8">
+
+    <!-- Sidebar -->
+    <aside class="w-full lg:w-64 flex-shrink-0">
+      <div class="bg-white rounded-[16px] shadow-sm overflow-hidden sticky top-24">
+        <div class="p-6 bg-primary text-white">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">
+              <span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
+            </div>
+            <div>
+              <h2 class="font-display font-bold text-lg">{{ request.user.get_full_name|default:request.user.username }}</h2>
+              <p class="text-gray-200 text-sm">Platform Administrator</p>
+            </div>
+          </div>
+        </div>
+        <nav class="py-2">
+          <a class="admin-sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'account:admin_dashboard' %}">
+            <span class="material-symbols-outlined mr-3 text-gray-500">dashboard</span>Dashboard
+          </a>
+          <a class="admin-sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="/products/">
+            <span class="material-symbols-outlined mr-3 text-gray-500">inventory_2</span>All Products
+          </a>
+          <a class="admin-sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'account:orders' %}">
+            <span class="material-symbols-outlined mr-3 text-gray-500">local_shipping</span>All Orders
+          </a>
+          <a class="admin-sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="/admin/">
+            <span class="material-symbols-outlined mr-3 text-gray-500">manage_accounts</span>Django Admin
+          </a>
+          <a class="admin-sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'account:settings' %}">
+            <span class="material-symbols-outlined mr-3 text-gray-500">settings</span>Settings
+          </a>
+        </nav>
+        <div class="p-4 border-t border-gray-100">
+          <a href="{% url 'account:logout' %}" class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-lg">logout</span>Sign Out
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 min-w-0">
+      <h1 class="text-2xl font-display font-bold text-primary mb-2">Platform Overview</h1>
+      <p class="text-gray-500 text-sm mb-6">Welcome back, {{ request.user.first_name|default:"Admin" }}. Here's what's happening on Cliq Mart today.</p>
+
+      <!-- Messages -->
+      {% if messages %}
+      <div class="mb-4 space-y-2">
+        {% for message in messages %}
+        <div class="px-4 py-3 rounded-lg text-sm font-medium {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Top KPI Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card bg-white rounded-2xl p-5 shadow-card border border-white/50">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-xl">currency_rupee</span>
+            </div>
+            <span class="text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">Total</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">₹{{ total_revenue|floatformat:0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Platform Revenue</p>
+          <p class="text-xs text-secondary font-medium mt-1">₹{{ revenue_30d|floatformat:0 }} this month</p>
+        </div>
+
+        <div class="stat-card bg-white rounded-2xl p-5 shadow-card border border-white/50">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+              <span class="material-symbols-outlined text-blue-600 text-xl">shopping_bag</span>
+            </div>
+            <span class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded-full">Total</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">{{ total_orders }}</p>
+          <p class="text-xs text-gray-500 mt-1">Total Orders</p>
+          <p class="text-xs text-blue-600 font-medium mt-1">{{ orders_30d }} in last 30 days</p>
+        </div>
+
+        <div class="stat-card bg-white rounded-2xl p-5 shadow-card border border-white/50">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
+              <span class="material-symbols-outlined text-purple-600 text-xl">group</span>
+            </div>
+            <span class="text-xs text-purple-600 font-semibold bg-purple-50 px-2 py-0.5 rounded-full">Total</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">{{ total_users }}</p>
+          <p class="text-xs text-gray-500 mt-1">Registered Users</p>
+          <p class="text-xs text-purple-600 font-medium mt-1">{{ new_users_30d }} new this month</p>
+        </div>
+
+        <div class="stat-card bg-white rounded-2xl p-5 shadow-card border border-white/50">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
+              <span class="material-symbols-outlined text-yellow-700 text-xl">storefront</span>
+            </div>
+            {% if pending_sellers > 0 %}
+            <span class="text-xs text-red-600 font-semibold bg-red-50 px-2 py-0.5 rounded-full">{{ pending_sellers }} pending</span>
+            {% else %}
+            <span class="text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">All approved</span>
+            {% endif %}
+          </div>
+          <p class="text-2xl font-bold text-gray-900">{{ total_sellers }}</p>
+          <p class="text-xs text-gray-500 mt-1">Active Sellers</p>
+          <p class="text-xs text-gray-400 font-medium mt-1">{{ total_customers }} customers</p>
+        </div>
+      </div>
+
+      <!-- Chart + Order Status -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+
+        <!-- Sales & Orders Chart -->
+        <div class="xl:col-span-2 bg-white rounded-2xl p-6 shadow-card border border-white/50">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-display font-bold text-primary flex items-center gap-2">
+              <span class="material-symbols-outlined">trending_up</span>Last 7 Days Activity
+            </h2>
+            <div class="flex gap-4 text-xs text-gray-500">
+              <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-primary inline-block"></span>Orders</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-accent inline-block"></span>Revenue (₹)</span>
+            </div>
+          </div>
+          <canvas id="adminChart" height="160"></canvas>
+        </div>
+
+        <!-- Order Status Breakdown -->
+        <div class="bg-white rounded-2xl p-6 shadow-card border border-white/50">
+          <h2 class="text-lg font-display font-bold text-primary flex items-center gap-2 mb-4">
+            <span class="material-symbols-outlined">donut_large</span>Order Status
+          </h2>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <span class="w-2 h-2 rounded-full bg-yellow-400 inline-block"></span>Pending
+              </div>
+              <span class="font-bold text-gray-800">{{ pending_orders }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <span class="w-2 h-2 rounded-full bg-indigo-400 inline-block"></span>Confirmed
+              </div>
+              <span class="font-bold text-gray-800">{{ confirmed_orders }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>Shipped
+              </div>
+              <span class="font-bold text-gray-800">{{ shipped_orders }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>Delivered
+              </div>
+              <span class="font-bold text-gray-800">{{ delivered_orders }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <span class="w-2 h-2 rounded-full bg-red-400 inline-block"></span>Cancelled
+              </div>
+              <span class="font-bold text-gray-800">{{ cancelled_orders }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <span class="w-2 h-2 rounded-full bg-gray-400 inline-block"></span>Returned
+              </div>
+              <span class="font-bold text-gray-800">{{ returned_orders }}</span>
+            </div>
+            <div class="mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-3">
+              <div class="bg-gray-50 rounded-xl p-3 text-center">
+                <p class="text-xs text-gray-500">Products</p>
+                <p class="text-lg font-bold text-primary">{{ active_products }}</p>
+                <p class="text-xs text-red-500">{{ out_of_stock }} OOS</p>
+              </div>
+              <div class="bg-gray-50 rounded-xl p-3 text-center">
+                <p class="text-xs text-gray-500">Reviews</p>
+                <p class="text-lg font-bold text-primary">{{ total_reviews }}</p>
+                <p class="text-xs text-gray-400">{{ total_categories }} categories</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Seller Approvals -->
+      {% if pending_seller_profiles %}
+      <div class="bg-white rounded-2xl p-6 shadow-card border border-white/50 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-display font-bold text-primary flex items-center gap-2">
+            <span class="material-symbols-outlined text-orange-500">pending_actions</span>
+            Pending Seller Approvals
+            <span class="ml-1 bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ pending_sellers }}</span>
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {% for sp in pending_seller_profiles %}
+          <div class="border border-orange-100 bg-orange-50/30 rounded-xl p-4 flex flex-col gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
+                {{ sp.store_name|make_list|first|upper }}
+              </div>
+              <div class="min-w-0">
+                <p class="font-semibold text-gray-900 text-sm truncate">{{ sp.store_name }}</p>
+                <p class="text-xs text-gray-500 truncate">{{ sp.user.email }}</p>
+              </div>
+            </div>
+            {% if sp.gstin %}
+            <p class="text-xs text-gray-500">GSTIN: <span class="font-mono font-medium text-gray-700">{{ sp.gstin }}</span></p>
+            {% endif %}
+            <form method="post" action="{% url 'account:approve_seller' sp.id %}">
+              {% csrf_token %}
+              <button type="submit" class="w-full py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-secondary transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-lg">check_circle</span>Approve Seller
+              </button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Bottom Row: Recent Orders + Top Sellers -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+
+        <!-- Recent Orders -->
+        <div class="xl:col-span-2 bg-white rounded-2xl p-6 shadow-card border border-white/50">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-display font-bold text-primary flex items-center gap-2">
+              <span class="material-symbols-outlined">receipt_long</span>Recent Orders
+            </h2>
+            <a href="{% url 'account:orders' %}" class="text-sm font-semibold text-secondary hover:underline">View all</a>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-100">
+                  <th class="text-left py-2 px-2 font-semibold text-gray-500 text-xs uppercase">Order ID</th>
+                  <th class="text-left py-2 px-2 font-semibold text-gray-500 text-xs uppercase">Customer</th>
+                  <th class="text-left py-2 px-2 font-semibold text-gray-500 text-xs uppercase">Amount</th>
+                  <th class="text-left py-2 px-2 font-semibold text-gray-500 text-xs uppercase">Status</th>
+                  <th class="text-left py-2 px-2 font-semibold text-gray-500 text-xs uppercase">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                {% for order in recent_orders %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="py-3 px-2 font-mono text-xs text-gray-600">{{ order.order_id }}</td>
+                  <td class="py-3 px-2 text-gray-800 text-xs">{{ order.user.get_full_name|default:order.user.username }}</td>
+                  <td class="py-3 px-2 font-semibold text-gray-800">₹{{ order.total_amount|floatformat:0 }}</td>
+                  <td class="py-3 px-2">
+                    {% if order.status == 'DELIVERED' %}<span class="px-2 py-0.5 bg-green-100 text-green-800 text-xs font-bold rounded-full">Delivered</span>
+                    {% elif order.status == 'SHIPPED' %}<span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">Shipped</span>
+                    {% elif order.status == 'PENDING' %}<span class="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">Pending</span>
+                    {% elif order.status == 'CONFIRMED' %}<span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-full">Confirmed</span>
+                    {% elif order.status == 'CANCELLED' %}<span class="px-2 py-0.5 bg-red-100 text-red-800 text-xs font-bold rounded-full">Cancelled</span>
+                    {% elif order.status == 'RETURNED' %}<span class="px-2 py-0.5 bg-gray-200 text-gray-700 text-xs font-bold rounded-full">Returned</span>
+                    {% endif %}
+                  </td>
+                  <td class="py-3 px-2">
+                    <form method="post" action="{% url 'account:update_order_status' order.id %}" class="flex gap-1 items-center">
+                      {% csrf_token %}
+                      <select name="status" class="text-xs border border-gray-200 rounded-lg px-1 py-1 text-gray-700 focus:ring-1 focus:ring-primary focus:outline-none">
+                        <option value="PENDING" {% if order.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                        <option value="CONFIRMED" {% if order.status == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
+                        <option value="SHIPPED" {% if order.status == 'SHIPPED' %}selected{% endif %}>Shipped</option>
+                        <option value="DELIVERED" {% if order.status == 'DELIVERED' %}selected{% endif %}>Delivered</option>
+                        <option value="CANCELLED" {% if order.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                        <option value="RETURNED" {% if order.status == 'RETURNED' %}selected{% endif %}>Returned</option>
+                      </select>
+                      <button type="submit" class="p-1 bg-primary text-white rounded-lg hover:bg-secondary transition-colors" title="Update">
+                        <span class="material-symbols-outlined text-base leading-none">check</span>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Top Sellers + Recent Users -->
+        <div class="flex flex-col gap-6">
+          <!-- Top Sellers -->
+          <div class="bg-white rounded-2xl p-6 shadow-card border border-white/50">
+            <h2 class="text-lg font-display font-bold text-primary flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined">workspace_premium</span>Top Sellers
+            </h2>
+            <div class="space-y-3">
+              {% for seller in top_sellers %}
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  {{ forloop.counter }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-800 truncate">
+                    {% if seller.sellerprofile %}{{ seller.sellerprofile.store_name }}{% else %}{{ seller.username }}{% endif %}
+                  </p>
+                  <p class="text-xs text-gray-400">{{ seller.order_count }} orders</p>
+                </div>
+                <p class="text-sm font-bold text-primary flex-shrink-0">₹{{ seller.revenue|floatformat:0|default:"0" }}</p>
+              </div>
+              {% empty %}
+              <p class="text-sm text-gray-400 text-center py-4">No seller data yet.</p>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Recent Users -->
+          <div class="bg-white rounded-2xl p-6 shadow-card border border-white/50">
+            <h2 class="text-lg font-display font-bold text-primary flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined">person_add</span>New Users
+            </h2>
+            <div class="space-y-3">
+              {% for u in recent_users %}
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  {{ u.first_name|default:u.username|make_list|first|upper }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-800 truncate">{{ u.get_full_name|default:u.username }}</p>
+                  <p class="text-xs text-gray-400 truncate">{{ u.email }}</p>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0
+                  {% if u.role == 'SELLER' %}bg-accent/20 text-yellow-800
+                  {% elif u.role == 'ADMIN' %}bg-primary/10 text-primary
+                  {% else %}bg-gray-100 text-gray-600{% endif %}">
+                  {{ u.role|title }}
+                </span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /flex -->
+</div><!-- /container -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+  const raw = {{ chart_data_json|safe }};
+  const ctx = document.getElementById('adminChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: raw.labels,
+      datasets: [
+        {
+          label: 'Orders',
+          data: raw.orders,
+          backgroundColor: 'rgba(0,95,2,0.2)',
+          borderColor: '#005F02',
+          borderWidth: 2,
+          borderRadius: 5,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Revenue (₹)',
+          data: raw.revenue,
+          type: 'line',
+          borderColor: '#C0B87A',
+          backgroundColor: 'rgba(192,184,122,0.1)',
+          borderWidth: 2,
+          pointBackgroundColor: '#C0B87A',
+          tension: 0.4,
+          fill: true,
+          yAxisID: 'y1',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.04)' }, title: { display: true, text: 'Orders' } },
+        y1: { beginAtZero: true, position: 'right', ticks: { callback: v => '₹' + v }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Revenue' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+})();
+</script>
+{% endblock %}

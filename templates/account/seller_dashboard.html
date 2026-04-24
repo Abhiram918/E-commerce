@@ -1,0 +1,346 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Seller Central Dashboard - Cliq Mart{% endblock %}
+
+{% block extra_css %}
+.card-gradient { background: linear-gradient(180deg, #FFFFFF 0%, #FDFBF5 100%); }
+.sidebar-link { transition: all 0.2s ease-in-out; }
+.sidebar-link:hover, .sidebar-link.active {
+    background-color: #F0F4F0;
+    color: #005F02;
+    font-weight: 600;
+}
+.sidebar-link.active { border-left: 4px solid #005F02; }
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+
+    <!-- Breadcrumbs -->
+    <nav aria-label="Breadcrumb" class="flex text-sm text-gray-600 mb-6">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+                    <span class="material-symbols-outlined text-sm mr-1">home</span>
+                    Home
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <a class="ml-1 font-medium text-gray-900 hover:text-primary transition-colors md:ml-2"
+                        href="{% url 'account:profile' %}">Seller Central</a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <span class="ml-1 font-medium text-gray-500 md:ml-2">Dashboard</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- Sidebar -------------->
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-[16px] shadow-sm overflow-hidden sticky top-24">
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">
+                            {{ request.user.sellerprofile.store_name|default:"S"|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">{{ request.user.sellerprofile.store_name|default:"Your Store" }}</h2>
+                            <p class="text-gray-200 text-sm">Seller ID: #{{ request.user.id }}</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="py-2">
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700"
+                        href="{% url 'account:profile' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">dashboard</span>
+                        Dashboard
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                        href="{% url 'products:seller_products' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">inventory_2</span>
+                        Inventory
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                        href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">local_shipping</span>
+                        Orders &amp; Shipping
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'account:seller_payments' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">payments</span>
+                        Payments
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                        href="{% url 'products:add_product' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">post_add</span>
+                        Add Product
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                        href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">store</span>
+                        Store Settings
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-gray-100">
+                    <a href="{% url 'account:logout' %}"
+                        class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ── Main Content ──────────────────────────────────────── -->
+        <div class="flex-1">
+            <h1 class="text-2xl font-display font-bold text-primary mb-6">Seller Central Dashboard Overview</h1>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+                <!-- ── Sales Chart Card ──────────────────────────────── -->
+                <div class="card-gradient rounded-[16px] p-6 shadow-card hover:shadow-xl transition-shadow duration-300 border border-white/50 col-span-1 md:col-span-2 xl:col-span-2">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-display font-bold text-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined">trending_up</span> Sales Overview
+                            <span class="text-sm font-normal text-gray-400 ml-1">(Last 7 Days)</span>
+                        </h2>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- Chart -->
+                        <div class="flex-1 min-h-[200px] relative">
+                            <canvas id="salesChart" height="180"></canvas>
+                        </div>
+                        <!-- Summary stats -->
+                        <div class="w-full md:w-48 flex flex-col justify-center space-y-4">
+                            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                <p class="text-xs text-gray-500 mb-1">Total Revenue</p>
+                                <h3 class="text-2xl font-bold text-primary">₹{{ total_revenue|floatformat:2 }}</h3>
+                                <p class="text-xs text-gray-500 mt-1">{{ total_orders }} order{{ total_orders|pluralize }}</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                <p class="text-xs text-gray-500 mb-1">Units Sold</p>
+                                <h3 class="text-2xl font-bold text-primary">{{ total_units }}</h3>
+                                <p class="text-xs text-gray-500 mt-1">{{ delivered }} delivered</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center gap-6 text-xs text-gray-500 justify-center md:justify-start">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-secondary inline-block"></span>
+                            Daily Sales (₹)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Order Performance Card ─────────────────────────── -->
+                <div class="card-gradient rounded-[16px] p-6 shadow-card hover:shadow-xl transition-shadow duration-300 border border-white/50 flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-display font-bold text-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined">verified</span> Order Performance
+                        </h2>
+                    </div>
+                    <div class="space-y-3 flex-grow">
+                        <a href="{% url 'account:orders' %}?filter=active"
+                            class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                </div>
+                                <span class="font-medium text-gray-700">Unshipped Orders</span>
+                            </div>
+                            <span class="text-xl font-bold text-primary">{{ unshipped }}</span>
+                        </a>
+                        <a href="{% url 'account:orders' %}?filter=all"
+                            class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
+                                    <span class="material-symbols-outlined">pending_actions</span>
+                                </div>
+                                <span class="font-medium text-gray-700">Pending</span>
+                            </div>
+                            <span class="text-xl font-bold text-primary">{{ pending }}</span>
+                        </a>
+                        <a href="{% url 'account:orders' %}?filter=returned"
+                            class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                                    <span class="material-symbols-outlined">assignment_return</span>
+                                </div>
+                                <span class="font-medium text-gray-700">Returns</span>
+                            </div>
+                            <span class="text-xl font-bold text-primary">{{ returns }}</span>
+                        </a>
+                        <a class="text-center block text-sm text-secondary font-semibold hover:underline pt-2"
+                            href="{% url 'account:orders' %}">Manage Orders</a>
+                    </div>
+                </div>
+
+                <!-- ── Inventory Alert Card ───────────────────────────── -->
+                <div class="card-gradient rounded-[16px] p-6 shadow-card hover:shadow-xl transition-shadow duration-300 border border-white/50 flex flex-col md:col-span-2 lg:col-span-1 xl:col-span-1">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-display font-bold text-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined">warning</span> Inventory Alert
+                        </h2>
+                        {% if critical_stock_count > 0 %}
+                        <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                            {{ critical_stock_count }} Critical
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if low_stock_products %}
+                    <div class="bg-white rounded-xl p-0 border border-gray-100 shadow-sm overflow-hidden flex-grow">
+                        <div class="divide-y divide-gray-100">
+                            {% for product in low_stock_products %}
+                            <div class="p-3 flex items-center gap-3">
+                                <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
+                                    {% with product.images.first as img %}
+                                        {% if img %}
+                                            <img src="{{ img.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover rounded">
+                                        {% else %}
+                                            <span class="material-symbols-outlined text-gray-400">inventory_2</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">{{ product.name }}</p>
+                                    {% if product.stock == 0 %}
+                                        <p class="text-xs text-red-700 font-bold">Out of Stock</p>
+                                    {% elif product.stock <= 5 %}
+                                        <p class="text-xs text-red-600 font-medium">Only {{ product.stock }} left</p>
+                                    {% else %}
+                                        <p class="text-xs text-yellow-600 font-medium">Low Stock ({{ product.stock }} left)</p>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'products:seller_products' %}"
+                                    class="px-3 py-1 bg-secondary text-white text-xs rounded hover:bg-primary transition-colors whitespace-nowrap">Restock</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="bg-green-50 rounded-xl p-6 flex-grow flex flex-col items-center justify-center text-center">
+                        <span class="material-symbols-outlined text-green-500 text-4xl mb-2">check_circle</span>
+                        <p class="text-sm text-green-700 font-medium">All products are well stocked!</p>
+                    </div>
+                    {% endif %}
+
+                    <a href="{% url 'products:seller_products' %}"
+                        class="mt-4 w-full py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors block text-center">
+                        View Full Inventory
+                    </a>
+                </div>
+
+                <!-- ── Recent Orders Table ────────────────────────────── -->
+                {% if recent_orders %}
+                <div class="card-gradient rounded-[16px] p-6 shadow-card hover:shadow-xl transition-shadow duration-300 border border-white/50 col-span-1 md:col-span-2 xl:col-span-3">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-display font-bold text-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined">receipt_long</span> Recent Orders
+                        </h2>
+                        <a class="text-sm font-semibold text-secondary hover:underline" href="{% url 'account:orders' %}">View all</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="text-left py-2 px-3 font-semibold text-gray-600">Order ID</th>
+                                    <th class="text-left py-2 px-3 font-semibold text-gray-600">Customer</th>
+                                    <th class="text-left py-2 px-3 font-semibold text-gray-600">Date</th>
+                                    <th class="text-left py-2 px-3 font-semibold text-gray-600">Amount</th>
+                                    <th class="text-left py-2 px-3 font-semibold text-gray-600">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                {% for order in recent_orders %}
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="py-3 px-3 font-mono text-xs text-gray-700">{{ order.order_id }}</td>
+                                    <td class="py-3 px-3 text-gray-800">{{ order.user.get_full_name|default:order.user.username }}</td>
+                                    <td class="py-3 px-3 text-gray-500">{{ order.created_at|date:"M d, Y" }}</td>
+                                    <td class="py-3 px-3 font-semibold text-gray-800">₹{{ order.total_amount|floatformat:2 }}</td>
+                                    <td class="py-3 px-3">
+                                        {% if order.status == 'DELIVERED' %}
+                                            <span class="px-2 py-0.5 bg-green-100 text-green-800 text-xs font-bold rounded-full">Delivered</span>
+                                        {% elif order.status == 'SHIPPED' %}
+                                            <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">Shipped</span>
+                                        {% elif order.status == 'PENDING' %}
+                                            <span class="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">Pending</span>
+                                        {% elif order.status == 'CONFIRMED' %}
+                                            <span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-full">Confirmed</span>
+                                        {% elif order.status == 'CANCELLED' %}
+                                            <span class="px-2 py-0.5 bg-red-100 text-red-800 text-xs font-bold rounded-full">Cancelled</span>
+                                        {% elif order.status == 'RETURNED' %}
+                                            <span class="px-2 py-0.5 bg-gray-200 text-gray-700 text-xs font-bold rounded-full">Returned</span>
+                                        {% else %}
+                                            <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-full">{{ order.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div><!-- /grid -->
+        </div><!-- /main content -->
+    </div><!-- /flex row -->
+</div><!-- /container -->
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const raw = {{ chart_data_json|safe }};
+    const ctx = document.getElementById('salesChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: raw.labels,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: raw.sales,
+                backgroundColor: 'rgba(66, 122, 67, 0.25)',
+                borderColor: '#427A43',
+                borderWidth: 2,
+                borderRadius: 6,
+                hoverBackgroundColor: 'rgba(66, 122, 67, 0.45)',
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => '₹' + ctx.parsed.y.toFixed(2)
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: v => '₹' + v
+                    },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}

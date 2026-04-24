@@ -1,0 +1,159 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}My Reviews - Cliq Mart{% endblock %}
+
+{% block extra_css %}
+.sidebar-link {
+transition: all 0.2s ease-in-out;
+}
+.sidebar-link:hover, .sidebar-link.active {
+background-color: #F0F4F0;
+color: #005F02;
+font-weight: 600;
+}
+.sidebar-link.active {
+border-left: 4px solid #005F02;
+}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+    <nav aria-label="Breadcrumb" class="flex text-sm text-gray-600 mb-6">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+                    <span class="material-symbols-outlined text-sm mr-1">home</span>
+                    Home
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <a class="ml-1 font-medium text-gray-900 hover:text-primary transition-colors md:ml-2"
+                        href="{% url 'account:profile' %}">Your Account</a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <span class="ml-1 font-medium text-gray-500 md:ml-2">My Reviews</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    <div class="flex flex-col lg:flex-row gap-8">
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-[16px] shadow-sm overflow-hidden sticky top-24">
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">
+                            {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}</div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">Hello, {{ request.user.first_name|default:request.user.username }}</h2>
+                            <p class="text-xs text-gray-200">Member since {{ request.user.date_joined|date:"Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="py-2">
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">shopping_bag</span>
+                        My Orders
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:wishlist' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">favorite</span>
+                        Wishlist
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:address_book' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">location_on</span>
+                        Address Book
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">manage_accounts</span>
+                        Account Settings
+                    </a>
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:reviews' %}">
+                        <span class="material-symbols-outlined mr-3">rate_review</span>
+                        My Reviews
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">headset_mic</span>
+                        Customer Support
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-gray-100">
+                    <a href="{% url 'account:logout' %}"
+                        class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </aside>
+        <div class="flex-1">
+            <h1 class="text-2xl font-display font-bold text-primary mb-6">My Reviews</h1>
+
+            <div class="space-y-6">
+                {% if reviews %}
+                <div class="grid gap-6">
+                    {% for review in reviews %}
+                    <div class="bg-white rounded-[12px] shadow-sm border border-gray-100 p-6">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            {% with review.product.images.first as cover_img %}
+                            {% if cover_img %}
+                            <img src="{{ cover_img.image.url }}" alt="{{ review.product.name }}" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-gray-100 flex-shrink-0">
+                            {% else %}
+                            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200 flex-shrink-0">
+                                <span class="material-symbols-outlined text-gray-400">image</span>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                            
+                            <div class="flex-1">
+                                <h3 class="font-display font-medium text-gray-900 border-b border-gray-100 pb-2 mb-3">{{ review.product.name }}</h3>
+                                <div class="flex items-center gap-1 mb-2">
+                                    {% for i in "12345"|make_list %}
+                                    <span class="material-symbols-outlined text-[16px] sm:text-lg {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-200{% endif %}" style="font-variation-settings: 'FILL' 1;">star</span>
+                                    {% endfor %}
+                                    <span class="text-xs sm:text-sm text-gray-500 ml-2">&bull; {{ review.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                <p class="text-sm sm:text-base text-gray-700 whitespace-pre-wrap mb-4">{{ review.comment }}</p>
+                                {% if review.image %}
+                                <div class="mt-3">
+                                    <h4 class="text-xs text-gray-400 mb-2 uppercase tracking-wider font-semibold">Your Photo</h4>
+                                    <img src="{{ review.image.url }}" alt="Your review photo" class="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg border border-gray-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity">
+                                </div>
+                                {% endif %}
+                                <div class="mt-4 flex gap-3">
+                                    <a href="{% url 'account:edit_review' review.id %}" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <span class="material-symbols-outlined text-sm">edit</span> Edit Review
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div
+                    class="bg-white rounded-[12px] shadow-card border border-gray-100 p-12 text-center flex flex-col items-center">
+                    <span class="material-symbols-outlined text-6xl text-gray-200 mb-4">rate_review</span>
+                    <h2 class="font-display text-2xl font-bold text-gray-900">You haven't written any reviews yet</h2>
+                    <p class="text-gray-500 mt-2">Help others by sharing your feedback on items you've purchased.</p>
+                    <a href="{% url 'account:profile' %}"
+                        class="mt-6 px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-secondary transition-colors inline-block">
+                        Review Your Orders
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

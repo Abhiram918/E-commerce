@@ -1,0 +1,257 @@
+{% extends 'base/base.html' %}
+
+{% block title %}All Products - Cliq Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <nav class="flex mb-4 text-xs font-bold text-gray-400 uppercase tracking-widest" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-primary transition-colors">Home</a>
+        <span class="mx-2 text-gray-300">/</span>
+        <span class="text-primary">All Products</span>
+    </nav>
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+        <div>
+            {% if search_query %}
+            <h1 class="text-3xl md:text-4xl font-display font-bold text-text-dark">Search Results for <span
+                    class="text-primary">"{{ search_query }}"</span></h1>
+            {% else %}
+            <h1 class="text-3xl md:text-4xl font-display font-bold text-text-dark">Shop Our <span
+                    class="text-primary">Collection</span></h1>
+            {% endif %}
+            <p class="text-gray-500 mt-2">Showing {{ products|length }} available products</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <label class="text-sm font-bold text-gray-500 whitespace-nowrap">Sort by:</label>
+            <select
+                class="bg-white border border-gray-200 rounded-full px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-accent outline-none cursor-pointer">
+                <option>Newest Arrivals</option>
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+                <option>Customer Rating</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        <aside class="w-full lg:w-64 flex-shrink-0 space-y-8">
+            <div class="bg-white rounded-[24px] p-6 shadow-card border border-gray-50">
+                <h3 class="font-display font-bold text-text-dark mb-4 pb-2 border-b border-gray-50">Categories</h3>
+                <div class="space-y-4">
+                    {% for cat in categories %}
+                    <div class="flex flex-col">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="category"
+                                class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-accent"
+                                onclick="window.location.href='{% url 'products:category_products' slug=cat.slug %}'" 
+                                {% if category and category.id == cat.id and not subcategory %}checked{% endif %}>
+                            <span
+                                class="text-sm {% if category and category.id == cat.id and not subcategory %}text-primary font-bold{% else %}text-gray-600 group-hover:text-primary transition-colors{% endif %}">{{ cat.name }}</span>
+                        </label>
+                        {% if cat.subcategories.all %}
+                        <div class="ml-7 mt-2 flex flex-col gap-2 border-l-2 border-gray-100 pl-3">
+                            {% for sub in cat.subcategories.all %}
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="radio" name="subcategory"
+                                    class="w-3 h-3 rounded-full border-gray-200 text-accent focus:ring-primary"
+                                    onclick="window.location.href='{% url 'products:subcategory_products' slug=cat.slug sub_slug=sub.slug %}'"
+                                    {% if subcategory and subcategory.id == sub.id %}checked{% endif %}>
+                                <span
+                                    class="text-xs {% if subcategory and subcategory.id == sub.id %}text-accent font-bold{% else %}text-gray-500 group-hover:text-accent transition-colors{% endif %}">{{ sub.name }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <label class="flex items-center gap-3 cursor-pointer group mt-4 pt-4 border-t border-gray-100">
+                        <input type="radio" name="category"
+                            class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-accent"
+                            onclick="window.location.href='{% url 'products:product_list' %}'" 
+                            {% if not category %}checked{% endif %}>
+                        <span
+                            class="text-sm {% if not category %}text-primary font-bold{% else %}text-gray-600 group-hover:text-primary transition-colors{% endif %}">All Categories</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[24px] p-6 shadow-card border border-gray-50">
+                <h3 class="font-display font-bold text-text-dark mb-4 pb-2 border-b border-gray-50">Price Range</h3>
+                <div class="space-y-2">
+                    {% for pr in price_ranges %}
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="radio" name="price_range"
+                            class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-accent"
+                            onclick="window.location.href='?{% if pr.min %}min_price={{ pr.min }}&{% endif %}{% if pr.max %}max_price={{ pr.max }}{% endif %}'"
+                            {% if min_price == pr.min and max_price == pr.max %}checked{% endif %}>
+                        <span
+                            class="text-sm {% if min_price == pr.min and max_price == pr.max %}text-primary font-bold{% else %}text-gray-600 group-hover:text-primary transition-colors{% endif %}">{{ pr.label }}</span>
+                    </label>
+                    {% endfor %}
+                    <label class="flex items-center gap-3 cursor-pointer group mt-4 pt-2 border-t border-gray-100">
+                        <input type="radio" name="price_range"
+                            class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-accent"
+                            onclick="window.location.href='?'" 
+                            {% if not min_price and not max_price %}checked{% endif %}>
+                        <span
+                            class="text-sm {% if not min_price and not max_price %}text-primary font-bold{% else %}text-gray-600 group-hover:text-primary transition-colors{% endif %}">Any Price</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="bg-primary rounded-[24px] p-6 text-white relative overflow-hidden">
+                <p class="text-xs font-bold uppercase tracking-widest text-accent mb-2">Free Delivery</p>
+                <h4 class="font-display font-bold text-lg leading-tight mb-4">On orders over $99</h4>
+                <a href="#"
+                    class="inline-block text-[10px] font-bold uppercase tracking-tighter border-b border-white pb-1">Learn
+                    More</a>
+                <span
+                    class="material-symbols-outlined absolute -bottom-4 -right-4 text-white/10 text-8xl">local_shipping</span>
+            </div>
+        </aside>
+
+        <div class="flex-1">
+            <div class="flex flex-col gap-6">
+                {% for product in products %}
+                <div
+                    class="bg-white rounded-[24px] overflow-hidden shadow-card hover:shadow-xl transition-all border border-gray-50 group flex flex-col md:flex-row">
+                    
+                    <!-- Left: Image Section -->
+                    <div class="md:w-[280px] h-[300px] md:h-auto bg-gray-50 relative overflow-hidden flex-shrink-0 cursor-pointer p-4 flex items-center justify-center"
+                         onclick="window.location.href='{% url 'products:product_detail' slug=product.slug %}'">
+                        {% if product.images.first %}
+                        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}"
+                            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 drop-shadow-sm blend-multiply">
+                        {% else %}
+                        <div class="w-full h-full bg-gray-200 flex items-center justify-center rounded-xl">
+                            <span class="text-gray-400">No Image</span>
+                        </div>
+                        {% endif %}
+
+                        {% if product.is_bestseller %}
+                        <div class="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                            <span
+                                class="bg-teal-500 text-white text-[10px] font-bold px-3 py-1 rounded-sm shadow-sm uppercase tracking-wide">Bestseller</span>
+                        </div>
+                        {% endif %}
+
+                        {% if request.user.is_authenticated and product.id in wishlist_product_ids %}
+                            <form action="{% url 'account:remove_from_wishlist' product.id %}" method="get"
+                                class="absolute top-4 right-4 z-20" onclick="event.stopPropagation();">
+                                <button type="submit"
+                                    class="bg-white text-red-500 w-8 h-8 rounded-full shadow-md flex items-center justify-center hover:bg-red-50 transition-colors"
+                                    title="Remove from Wishlist">
+                                    <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                                </button>
+                            </form>
+                        {% else %}
+                            <form action="{% url 'account:add_to_wishlist' product.id %}" method="get"
+                                class="absolute top-4 right-4 z-20" onclick="event.stopPropagation();">
+                                <button type="submit"
+                                    class="bg-white/80 text-gray-400 w-8 h-8 rounded-full shadow-sm flex items-center justify-center hover:text-red-500 hover:bg-white transition-colors"
+                                    title="Add to Wishlist">
+                                    <span class="material-symbols-outlined text-xl">favorite</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Middle & Right: Content Section -->
+                    <div class="p-6 flex-1 flex flex-col sm:flex-row gap-6">
+                        
+                        <!-- Middle: Details -->
+                        <div class="flex-1 flex flex-col">
+                            <h4 class="font-display font-medium text-text-dark text-xl hover:text-primary transition-colors cursor-pointer mb-2"
+                                onclick="window.location.href='{% url 'products:product_detail' slug=product.slug %}'">
+                                {{ product.name }}
+                            </h4>
+
+                            <div class="flex items-center gap-2 mb-4">
+                                {% if product.average_rating and product.average_rating > 0 %}
+                                <div class="bg-green-600 text-white flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold">
+                                    {{ product.average_rating }} <span class="material-symbols-outlined text-[10px] fill-1" style="font-variation-settings: 'FILL' 1;">star</span>
+                                </div>
+                                {% else %}
+                                <div class="bg-gray-400 text-white flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold">
+                                    0 <span class="material-symbols-outlined text-[10px] fill-1" style="font-variation-settings: 'FILL' 1;">star</span>
+                                </div>
+                                {% endif %}
+                                <span class="text-sm font-medium text-gray-500 hover:underline cursor-pointer">{{ product.reviews_count }} Ratings & Reviews</span>
+                            </div>
+
+                            <ul class="text-sm text-gray-600 space-y-2 mt-2 list-disc pl-4 marker:text-gray-300">
+                                {% if product.category %}<li>Category: {{ product.category.name }}</li>{% endif %}
+                                {% if product.subcategory %}<li>Type: {{ product.subcategory.name }}</li>{% endif %}
+                                <li>{{ product.description|truncatewords:25 }}</li>
+                                <li>1 Year Limited Warranty</li>
+                            </ul>
+                        </div>
+
+                        <!-- Right: Action -->
+                        <div class="sm:w-[220px] sm:pl-6 flex flex-col justify-start">
+                            <div class="mb-4">
+                                {% if product.discounted_price %}
+                                <div class="flex items-end gap-3 mb-1">
+                                    <span class="text-3xl font-display font-bold text-text-dark">${{ product.discounted_price }}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-400 line-through">${{ product.price }}</span>
+                                    <span class="text-xs text-green-600 font-bold">{{ product.discount_percentage }}% off</span>
+                                </div>
+                                {% else %}
+                                <div class="flex items-end gap-3 mb-1">
+                                    <span class="text-3xl font-display font-bold text-text-dark">${{ product.price }}</span>
+                                </div>
+                                {% endif %}
+                                
+                                <span class="text-xs text-green-600 font-bold block mt-1">Bank Offer Available</span>
+                                
+                            </div>
+                            
+                            <form action="{% url 'orders:add_to_cart' product.id %}" method="POST" class="mt-auto">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="w-full bg-primary hover:bg-secondary text-white px-4 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-md">
+                                    <span class="material-symbols-outlined text-base">shopping_cart</span> Add to Cart
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-full py-12 text-center bg-white rounded-[24px] border border-gray-50 shadow-sm flex flex-col items-center justify-center min-h-[300px]">
+                    <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">search_off</span>
+                    {% if search_query %}
+                    <h3 class="text-xl font-display font-bold text-text-dark mb-2">Couldn't find the product</h3>
+                    <p class="text-gray-500 max-w-md">We couldn't find any items matching "<span class="font-bold text-gray-700">{{ search_query }}</span>". Please try checking your spelling or use more general terms.</p>
+                    {% else %}
+                    <h3 class="text-xl font-display font-bold text-text-dark mb-2">No products found</h3>
+                    <p class="text-gray-500">There are currently no products available in this section.</p>
+                    {% endif %}
+                    <a href="{% url 'products:product_list' %}" class="mt-6 bg-primary text-white px-6 py-2 rounded-full font-bold hover:bg-secondary transition-colors">View All Products</a>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-12 flex justify-center items-center gap-2">
+                <button
+                    class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:border-primary hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button
+                    class="w-10 h-10 rounded-full bg-primary text-white font-bold flex items-center justify-center shadow-md">1</button>
+                <button
+                    class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:border-primary hover:text-primary transition-colors font-bold">2</button>
+                <button
+                    class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:border-primary hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

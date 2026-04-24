@@ -1,0 +1,47 @@
+{% extends 'base/base.html' %}
+
+{% block title %}About Us - Cliq Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-20 px-6 min-h-[60vh]">
+    <div class="text-center mb-16">
+        <h1 class="text-5xl font-display font-bold text-text-dark mb-6">Our Story</h1>
+        <p class="text-xl text-gray-600 leading-relaxed">
+            Connecting passionate sellers with quality-focused buyers since 2024.
+        </p>
+    </div>
+
+    <div
+        class="bg-white rounded-[32px] p-10 shadow-card border border-gray-50 space-y-8 text-gray-700 leading-relaxed font-sans">
+        <p>
+            Cliq Mart was founded with a simple mission: to build a marketplace that feels like a community. We believe
+            that online shopping should be transparent, secure, and—most importantly—human.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-6">
+            <div class="space-y-4">
+                <h3 class="text-2xl font-display font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">verified_user</span> Our Values
+                </h3>
+                <p class="text-sm italic">"Trust is our currency."</p>
+                <p>We vet every seller on our platform to ensure that your experience is safe and consistent every time
+                    you click "Buy".</p>
+            </div>
+            <div class="space-y-4">
+                <h3 class="text-2xl font-display font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">eco</span> Sustainability
+                </h3>
+                <p class="text-sm italic">"Green is more than our brand color."</p>
+                <p>We prioritize local shipping and eco-friendly packaging initiatives to reduce our collective
+                    footprint.</p>
+            </div>
+        </div>
+
+        <div class="bg-background-light/30 rounded-2xl p-8 border-l-4 border-primary italic text-lg">
+            "We aren't just selling products; we're facilitating the growth of small businesses and the satisfaction of
+            smart shoppers."
+            <footer class="mt-4 not-italic font-bold text-text-dark">— The Cliq Team</footer>
+        </div>
+    </div>
+</div>
+{% endblock %}

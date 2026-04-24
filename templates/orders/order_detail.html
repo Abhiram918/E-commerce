@@ -1,0 +1,125 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Order Details #CQ-99201 - Cliq Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-[80vh]">
+
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <a href="/orders/order_history/"
+                class="text-sm font-bold text-primary flex items-center gap-1 hover:underline mb-2">
+                <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Orders
+            </a>
+            <h1 class="text-3xl font-display font-bold text-text-dark">Order <span class="text-primary">#CQ-99201</span>
+            </h1>
+            <p class="text-gray-500 text-sm font-medium">Placed on March 18, 2026 • 04:32 PM</p>
+        </div>
+        <div class="flex gap-3">
+            <button
+                class="px-6 py-2.5 rounded-full border border-gray-300 text-gray-600 font-bold hover:bg-gray-50 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">download</span> Invoice
+            </button>
+            <button
+                class="px-6 py-2.5 rounded-full bg-primary text-white font-bold shadow-lg hover:bg-secondary transition-all">Buy
+                Again</button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[32px] p-8 shadow-card border border-gray-50 mb-10">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl">local_shipping</span>
+                </div>
+                <div>
+                    <h3 class="font-display font-bold text-text-dark text-lg">In Transit</h3>
+                    <p class="text-xs text-gray-500">Estimated Delivery: <span class="font-bold text-text-dark">March
+                            21, 2026</span></p>
+                </div>
+            </div>
+
+            <div class="flex-1 w-full max-w-md">
+                <div class="relative w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="absolute top-0 left-0 h-full bg-primary rounded-full w-2/3"></div>
+                </div>
+                <div class="flex justify-between mt-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <span class="text-primary">Confirmed</span>
+                    <span class="text-primary">Shipped</span>
+                    <span>Delivered</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-[32px] overflow-hidden shadow-card border border-gray-50">
+                <div class="p-6 border-b border-gray-50 bg-gray-50/30">
+                    <h3 class="font-display font-bold text-text-dark uppercase text-xs tracking-widest">Items in your
+                        package</h3>
+                </div>
+                <div class="divide-y divide-gray-50">
+                    {% for i in "12" %}
+                    <div class="p-6 flex items-center gap-6 group">
+                        <div class="w-20 h-20 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0">
+                            <img src="https://via.placeholder.com/200" alt="Product" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-text-dark group-hover:text-primary transition-colors">Premium
+                                Essential Watch v2</h4>
+                            <p class="text-xs text-gray-400 mt-1">Variant: Midnight Black / Leather</p>
+                            <p class="text-sm font-bold text-primary mt-2">Qty: 1 × $129.00</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-display font-bold text-text-dark">$129.00</p>
+                            <button class="text-[10px] font-bold text-primary uppercase mt-2 hover:underline">Review
+                                Item</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-8">
+            <div class="bg-white rounded-[32px] p-8 shadow-card border border-gray-50">
+                <h3 class="font-display font-bold text-text-dark mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-xl">location_on</span> Shipping
+                </h3>
+                <div class="text-sm text-gray-600 leading-relaxed font-sans">
+                    <p class="font-bold text-text-dark">{{ user.get_full_name|default:user.username }}</p>
+                    <p>123 Market Street, Apt 4B</p>
+                    <p>New York, NY 10001</p>
+                    <p class="mt-2 text-xs text-gray-400">Phone: +1 (555) 000-0000</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[32px] p-8 shadow-card border border-gray-50">
+                <h3 class="font-display font-bold text-text-dark mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-xl">payments</span> Payment
+                </h3>
+                <div class="text-sm text-gray-600 space-y-3">
+                    <div class="flex justify-between">
+                        <span>Method:</span>
+                        <span class="font-bold text-text-dark">Visa **** 4242</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span class="font-bold text-text-dark">$258.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Shipping:</span>
+                        <span class="text-green-600 font-bold">Free</span>
+                    </div>
+                    <div class="border-t border-gray-100 pt-3 flex justify-between items-end">
+                        <span class="font-display font-bold text-text-dark">Total:</span>
+                        <span class="text-2xl font-display font-bold text-primary">$258.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

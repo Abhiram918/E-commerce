@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>{% block title %}Cliq Mart - Modern Marketplace{% endblock %}</title>
+
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#005F02",
+            "secondary": "#427A43",
+            "accent": "#C0B87A",
+            "background-light": "#F9FAFB",
+            "background-white": "#FFFFFF",
+            "text-dark": "#0f1111",
+            "text-light": "#ffffff",
+          },
+          fontFamily: {
+            "sans": ["Inter", "sans-serif"],
+            "display": ["Montserrat", "sans-serif"]
+          },
+          boxShadow: {
+            'glass': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 2px 4px 0 rgba(255, 255, 255, 0.15)',
+            'card': '0 4px 20px rgba(0, 0, 0, 0.05)',
+          }
+        },
+      },
+    }
+  </script>
+
+  <style>
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .glass-nav {
+      background: rgba(66, 122, 67, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .card-gradient {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FDFBF5 100%);
+    }
+
+    .hover-scale-img {
+      transition: transform 0.3s ease;
+    }
+
+    .hover-scale-img:hover {
+      transform: scale(1.05);
+    }
+
+    {% block extra_css %}
+
+    {% endblock %}
+    
+  </style>
+</head>
+
+<body class="bg-background-light text-text-dark font-sans antialiased overflow-x-hidden min-h-screen flex flex-col">
+
+  {% include 'base/navbar.html' %}
+
+  <main class="flex-grow w-full">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  {% include 'base/footer.html' %}
+
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

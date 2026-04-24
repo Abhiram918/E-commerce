@@ -1,0 +1,97 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Order Successful - Cliq Mart{% endblock %}
+
+{% block content %}
+<div
+    class="max-w-[1480px] mx-auto px-4 py-20 flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-1000">
+
+    <!-- Celebration Icon -->
+    <div class="relative mb-12">
+        <div
+            class="w-40 h-40 bg-accent rounded-[3rem] flex items-center justify-center text-primary shadow-2xl animate-bounce duration-[2000ms] relative z-10">
+            <span class="material-symbols-outlined text-7xl fill-1">celebration</span>
+        </div>
+        <!-- Animated Bubbles -->
+        <div class="absolute -top-4 -left-4 w-12 h-12 bg-primary rounded-full animate-ping opacity-20"></div>
+        <div class="absolute -bottom-6 -right-6 w-20 h-20 bg-primary/10 rounded-full animate-pulse"></div>
+        <div class="absolute top-1/2 -right-8 w-8 h-8 bg-accent rounded-full animate-ping opacity-30"></div>
+    </div>
+
+    <!-- Success Message -->
+    <h1 class="text-4xl md:text-6xl font-black text-gray-900 font-display tracking-tight leading-none mb-6">
+        Woohoo! Your order is <br>
+        <span class="text-primary italic">Confirmed!</span>
+    </h1>
+
+    <p class="text-lg text-gray-500 font-medium max-w-[500px] mb-12 leading-relaxed">
+        We've received your order and we're getting it ready for shipment.
+        You'll receive a confirmation email with all the details shortly.
+    </p>
+
+    <!-- Order Info Card -->
+    <div
+        class="bg-white rounded-[3rem] p-10 shadow-card border border-gray-100 w-full max-w-[800px] mb-16 relative overflow-hidden group">
+        <!-- Floating Accent -->
+        <div
+            class="absolute -right-10 -bottom-10 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:scale-150 transition-transform">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+            <div class="flex flex-col text-center">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Order Number</span>
+                <span class="font-black text-xl text-gray-900">#{{ order.order_id }}</span>
+            </div>
+            <div class="flex flex-col text-center border-y md:border-y-0 md:border-x border-gray-100 py-6 md:py-0">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Date Received</span>
+                <span class="font-black text-xl text-gray-900">{{ order.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div class="flex flex-col text-center">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Total Paid</span>
+                <span class="font-black text-2xl text-primary font-display tracking-tighter">${{ order.total_amount }}</span>
+            </div>
+        </div>
+
+        <div class="mt-10 h-px bg-gray-50"></div>
+
+        <div class="mt-8 flex flex-col items-center">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Items inside your box</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                {% for item in order.items.all %}
+                <div
+                    class="w-12 h-12 bg-gray-50 rounded-xl overflow-hidden p-1 border border-gray-100 hover:scale-110 transition-transform">
+                    {% if item.product.images.first %}
+                    <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}"
+                        class="w-full h-full object-contain">
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-6 w-full max-w-[600px] justify-center">
+        <a href="{% url 'account:profile' %}"
+            class="flex-1 px-10 py-5 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:brightness-110 hover:-translate-y-1 active:translate-y-0 transition-all text-center flex items-center justify-center gap-3 group">
+            <span
+                class="material-symbols-outlined text-2xl group-hover:-translate-x-1 transition-transform">shopping_bag</span>
+            My Orders Dashboard
+        </a>
+        <a href="/"
+            class="flex-1 px-10 py-5 bg-white border-2 border-gray-100 text-gray-700 font-black rounded-2xl hover:border-primary/20 hover:text-primary transition-all text-center flex items-center justify-center gap-3 group">
+            <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">explore</span>
+            Back to Shop
+        </a>
+    </div>
+
+    <!-- Support Link -->
+    <p class="mt-20 text-sm font-bold text-gray-400 flex items-center gap-2">
+        <span class="material-symbols-outlined text-lg">support_agent</span>
+        Need help with your order?
+        <a href="#" class="text-primary hover:underline ml-1">Contact Support</a>
+    </p>
+
+</div>
+{% endblock %}

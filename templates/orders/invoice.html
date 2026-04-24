@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice - {{ order.order_id }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Montserrat', sans-serif; }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            .invoice-wrapper {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8 flex justify-center">
+
+    <div class="max-w-[800px] w-full flex flex-col gap-6">
+        <!-- Controls -->
+        <div class="no-print flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+            <a href="{% url 'account:orders' %}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 border border-gray-200 transition-colors">
+                Back to Orders
+            </a>
+            <button onclick="downloadInvoice()" class="px-6 py-2 text-sm font-bold text-white bg-[#005F02] hover:bg-[#427A43] rounded-lg shadow-md transition-colors flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download PDF
+            </button>
+        </div>
+
+        <!-- Invoice Document -->
+        <div id="invoice-content" class="invoice-wrapper bg-white w-full rounded-2xl shadow-xl border border-gray-100 overflow-hidden p-10 md:p-14">
+            
+            <!-- Header -->
+            <div class="flex justify-between items-start border-b-2 border-gray-100 pb-8 mb-8">
+                <div>
+                    <h1 class="text-4xl font-display font-bold text-[#005F02] tracking-tight mb-1">Cliq Mart</h1>
+                    <p class="text-sm text-gray-500 font-medium">The Modern Marketplace</p>
+                </div>
+                <div class="text-right">
+                    <h2 class="text-3xl font-display font-light text-gray-400 tracking-widest mb-2 uppercase">Invoice</h2>
+                    <p class="text-sm text-gray-600"><strong>Date:</strong> {{ order.created_at|date:"M d, Y" }}</p>
+                    <p class="text-sm text-gray-600"><strong>Invoice No:</strong> INV-{{ order.order_id|slice:"4:" }}</p>
+                    <p class="text-sm text-gray-600"><strong>Order ID:</strong> {{ order.order_id }}</p>
+                </div>
+            </div>
+
+            <!-- Addresses -->
+            <div class="flex flex-col sm:flex-row justify-between gap-8 mb-12">
+                <div class="flex-1">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Billed & Shipped To</h3>
+                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <p class="font-bold text-gray-800 text-base mb-1">{{ order.shippingaddress.full_name }}</p>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            {{ order.shippingaddress.address }}<br>
+                            {{ order.shippingaddress.city }}, {{ order.shippingaddress.state }}<br>
+                            {{ order.shippingaddress.postal_code }}<br>
+                            {{ order.shippingaddress.country }}
+                        </p>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">From</h3>
+                    <div class="p-4 rounded-xl border border-gray-100">
+                        <p class="font-bold text-gray-800 text-base mb-1">Cliq Mart Inc.</p>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            123 Commerce Avenue<br>
+                            Tech District, San Francisco<br>
+                            CA 94107
+                        </p>
+                        <p class="text-sm text-gray-600 mt-2">support@cliqmart.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="mb-10">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b-2 border-[#005F02] text-[#005F02]">
+                            <th class="py-3 px-2 text-sm font-bold uppercase tracking-wider">Item Description</th>
+                            <th class="py-3 px-2 text-sm font-bold uppercase tracking-wider text-center">Qty</th>
+                            <th class="py-3 px-2 text-sm font-bold uppercase tracking-wider text-right">Unit Price</th>
+                            <th class="py-3 px-2 text-sm font-bold uppercase tracking-wider text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                        {% for item in order.items.all %}
+                        <tr class="border-b border-gray-100">
+                            <td class="py-4 px-2">
+                                <p class="font-semibold text-gray-900">{{ item.product.name }}</p>
+                                <p class="text-xs text-gray-500 mt-1">Sold by: {{ item.product.seller.sellerprofile.store_name|default:item.product.seller.username }}</p>
+                            </td>
+                            <td class="py-4 px-2 text-center">{{ item.quantity }}</td>
+                            <td class="py-4 px-2 text-right">${{ item.price }}</td>
+                            <td class="py-4 px-2 text-right font-bold">${{ item.total_price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Totals -->
+            <div class="flex justify-end mb-12">
+                <div class="w-full max-w-[300px]">
+                    <div class="flex justify-between py-2 text-sm text-gray-600 border-b border-gray-100">
+                        <span>Subtotal</span>
+                        <span>${{ order.total_amount }}</span>
+                    </div>
+                    <div class="flex justify-between py-2 text-sm text-gray-600 border-b border-gray-100">
+                        <span>Shipping & Handling</span>
+                        <span>$0.00</span>
+                    </div>
+                    <div class="flex justify-between py-2 text-sm text-gray-600 border-b border-gray-100">
+                        <span>Tax</span>
+                        <span>$0.00</span>
+                    </div>
+                    <div class="flex justify-between py-4 text-xl font-bold text-[#005F02]">
+                        <span>Total</span>
+                        <span>${{ order.total_amount }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t border-gray-100 pt-8 mt-12 text-center">
+                <p class="text-sm text-gray-600 font-medium mb-1">Thank you for your business!</p>
+                <p class="text-xs text-gray-400">If you have any questions concerning this invoice, contact our support at support@cliqmart.com.</p>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        function downloadInvoice() {
+            const element = document.getElementById('invoice-content');
+            const opt = {
+                margin:       0.5,
+                filename:     'Invoice_{{ order.order_id }}.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>

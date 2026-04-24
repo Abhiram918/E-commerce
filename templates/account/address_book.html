@@ -1,0 +1,394 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Address Book - Cliq Mart{% endblock %}
+
+{% block extra_css %}
+.sidebar-link {
+transition: all 0.2s ease-in-out;
+}
+.sidebar-link:hover, .sidebar-link.active {
+background-color: #F0F4F0;
+color: #005F02;
+font-weight: 600;
+}
+.sidebar-link.active {
+border-left: 4px solid #005F02;
+}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+    <nav aria-label="Breadcrumb" class="flex text-sm text-gray-600 mb-6">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+                    <span class="material-symbols-outlined text-sm mr-1">home</span>
+                    Home
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <a class="ml-1 font-medium text-gray-900 hover:text-primary transition-colors md:ml-2"
+                        href="{% url 'account:profile' %}">Your Account</a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <span class="ml-1 font-medium text-gray-500 md:ml-2">Address Book</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    <div class="flex flex-col lg:flex-row gap-8">
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-[16px] shadow-sm overflow-hidden sticky top-24">
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">
+                            {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}</div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">Hello, {{ request.user.first_name|default:request.user.username }}</h2>
+                            <p class="text-xs text-gray-200">Member since {{ request.user.date_joined|date:"Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="py-2">
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">shopping_bag</span>
+                        My Orders
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:wishlist' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">favorite</span>
+                        Wishlist
+                    </a>
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:address_book' %}">
+                        <span class="material-symbols-outlined mr-3">location_on</span>
+                        Address Book
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">manage_accounts</span>
+                        Account Settings
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:reviews' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">rate_review</span>
+                        My Reviews
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">headset_mic</span>
+                        Customer Support
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-gray-100">
+                    <a href="{% url 'account:logout' %}"
+                        class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </aside>
+        <div class="flex-1">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <h1 class="text-2xl font-display font-bold text-primary">Your Addresses</h1>
+                <button onclick="document.getElementById('address-form-container').classList.remove('hidden')"
+                    class="flex items-center gap-2 text-sm font-medium text-primary hover:text-secondary rounded-lg px-4 py-2 border border-primary transition-colors">
+                    <span class="material-symbols-outlined text-lg">add</span> Add / Edit Address
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% if addresses %}
+                    {% for address in addresses %}
+                    <div class="bg-white rounded-[12px] shadow-card {% if address.is_default %}border border-primary{% else %}border border-gray-200{% endif %} p-6 relative">
+                        {% if address.is_default %}
+                        <div class="absolute top-4 right-4 text-xs font-bold bg-primary text-white px-2 py-1 rounded">
+                            DEFAULT</div>
+                        {% endif %}
+                        <div class="flex justify-between items-start mb-2 mt-2">
+                            <span class="font-bold text-gray-900">{{ address.full_name }}</span>
+                            {% if not address.is_default %}
+                            <span class="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-2 py-1 rounded-md">{{ address.get_address_type_display }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-sm text-gray-600 mb-1 leading-snug">{{ address.address_line }}{% if address.landmark %}, {{ address.landmark }}{% endif %}</p>
+                        <p class="text-sm text-gray-600 mb-2">{{ address.town_city }}, {{ address.state }} - {{ address.pincode }}</p>
+                        <p class="text-sm text-gray-600 font-medium flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">phone_iphone</span> {{ address.mobile_number }}
+                        </p>
+
+                        <div class="flex items-center gap-4 mt-6 text-sm">
+                            {% if not address.is_default %}
+                            <form method="POST" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="set_default">
+                                <input type="hidden" name="address_id" value="{{ address.id }}">
+                                <button type="submit" class="text-primary hover:underline font-medium">Make Default</button>
+                            </form>
+                            <span class="text-gray-300">|</span>
+                            {% endif %}
+                            <form method="POST" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="remove">
+                                <input type="hidden" name="address_id" value="{{ address.id }}">
+                                <button type="submit" class="text-red-500 hover:underline font-medium">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div
+                    class="bg-white rounded-[12px] shadow-card border border-dashed border-gray-300 p-12 text-center flex flex-col items-center col-span-full">
+                    <span class="material-symbols-outlined text-6xl text-gray-200 mb-4">home_pin</span>
+                    <h2 class="font-display text-2xl font-bold text-gray-900">No addresses saved</h2>
+                    <p class="text-gray-500 mt-2">Add an address so you can checkout faster.</p>
+                    <button onclick="document.getElementById('address-form-container').classList.remove('hidden')"
+                        class="mt-6 px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-secondary transition-colors inline-block">
+                        Add New Address
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Form container (hidden by default unless triggered) -->
+            <div id="address-form-container"
+                class="hidden mt-8 bg-[#FDFBJ6] p-8 rounded-[16px] shadow-sm border border-gray-100">
+                <div class="mb-6">
+                    <a href="#" onclick="document.getElementById('address-form-container').classList.add('hidden')"
+                        class="text-secondary font-bold text-sm flex items-center gap-1 hover:underline">
+                        <span class="material-symbols-outlined text-sm">chevron_left</span> Back to Address Book
+                    </a>
+                    <h2 class="font-display text-3xl font-bold mt-4 text-gray-900">Add New Address</h2>
+                    <p class="text-secondary text-sm">Please provide the details for your new delivery location.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-[16px] shadow-sm">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="save">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Full
+                                    Name</label>
+                                <input type="text" name="full_name"
+                                    class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary focus:ring-primary h-12 px-4"
+                                    placeholder="Julian Reed" required>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Mobile
+                                    Number</label>
+                                <input type="text" name="mobile_number"
+                                    class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary focus:ring-primary h-12 px-4"
+                                    placeholder="+1 555-0123" required>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label
+                                    class="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Pincode/Postcode</label>
+                                <input type="text" name="pincode" id="pincode"
+                                    class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary focus:ring-primary h-12 px-4"
+                                    placeholder="10001" required>
+                                <p id="pincode-info" class="text-[10px] text-green-600 mt-1"></p>
+                                <p id="pincode-error" class="text-[10px] text-red-600 mt-1"></p>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">State</label>
+                                <select name="state"
+                                    class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary focus:ring-primary h-12 px-4 text-gray-700 bg-white"
+                                    required>
+                                    <option value="" disabled selected>Select State</option>
+                                    <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                    <option value="Assam">Assam</option>
+                                    <option value="Bihar">Bihar</option>
+                                    <option value="Chandigarh">Chandigarh</option>
+                                    <option value="Chhattisgarh">Chhattisgarh</option>
+                                    <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and
+                                        Daman and Diu</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Goa">Goa</option>
+                                    <option value="Gujarat">Gujarat</option>
+                                    <option value="Haryana">Haryana</option>
+                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                    <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                    <option value="Jharkhand">Jharkhand</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Kerala">Kerala</option>
+                                    <option value="Ladakh">Ladakh</option>
+                                    <option value="Lakshadweep">Lakshadweep</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Manipur">Manipur</option>
+                                    <option value="Meghalaya">Meghalaya</option>
+                                    <option value="Mizoram">Mizoram</option>
+                                    <option value="Nagaland">Nagaland</option>
+                                    <option value="Odisha">Odisha</option>
+                                    <option value="Puducherry">Puducherry</option>
+                                    <option value="Punjab">Punjab</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                    <option value="Sikkim">Sikkim</option>
+                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                    <option value="Telangana">Telangana</option>
+                                    <option value="Tripura">Tripura</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                    <option value="Uttarakhand">Uttarakhand</option>
+                                    <option value="West Bengal">West Bengal</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Address
+                                (House No, Building, Street)</label>
+                            <input type="text" name="address_line"
+                                class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary focus:ring-primary h-12 px-4"
+                                placeholder="42 Botanical Grove" required>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <label
+                                    class="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Landmark
+                                    (Optional)</label>
+                                <input type="text" name="landmark"
+                                    class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary focus:ring-primary h-12 px-4"
+                                    placeholder="Near Green Park">
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Town/City</label>
+                                <input type="text" name="town_city"
+                                    class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary focus:ring-primary h-12 px-4"
+                                    placeholder="Manhattan" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <label class="block text-xs font-bold text-secondary uppercase tracking-wider mb-3">Address
+                                Type</label>
+                            <div class="flex flex-wrap gap-6">
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <input type="radio" name="address_type" value="home" checked
+                                        class="w-5 h-5 text-primary focus:ring-primary border-gray-300">
+                                    <span class="flex items-center gap-1 font-bold text-gray-800 text-sm"><span
+                                            class="material-symbols-outlined text-[20px] text-primary">home</span>
+                                        Home</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <input type="radio" name="address_type" value="office"
+                                        class="w-5 h-5 text-primary focus:ring-primary border-gray-300">
+                                    <span class="flex items-center gap-1 font-bold text-gray-800 text-sm"><span
+                                            class="material-symbols-outlined text-[20px] mb-1 text-primary">domain</span>
+                                        Office</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-10">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" name="is_default"
+                                    class="w-5 h-5 text-primary focus:ring-primary border-gray-300 rounded">
+                                <span class="font-bold text-gray-800 text-sm">Set as Default Delivery Address</span>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end items-center gap-6 pt-4 border-t border-gray-50">
+                            <button type="button"
+                                onclick="document.getElementById('address-form-container').classList.add('hidden')"
+                                class="text-secondary font-bold hover:text-primary transition-colors text-sm">Cancel</button>
+                            <button type="submit"
+                                class="bg-primary hover:bg-secondary text-white font-bold px-10 py-3 block rounded-[8px] transition-colors shadow-md">Save
+                                Address</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info box -->
+            <div class="mt-8 bg-[#EFEFE6] border border-[#DEE2D6] p-4 rounded-lg flex items-start gap-3">
+                <span class="material-symbols-outlined text-primary"
+                    style="font-variation-settings: 'FILL' 1;">info</span>
+                <p class="text-xs text-gray-600 font-medium leading-relaxed">
+                    Your addresses are kept secure and used only for shipping fulfillment. You can manage your
+                    preferences and delete addresses at any time from the Address Book dashboard.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const pinInput = document.getElementById("pincode");
+        const pinInfo = document.getElementById("pincode-info");
+        const pinError = document.getElementById("pincode-error");
+
+        let pinTimeout = null;
+
+        if (pinInput) {
+            pinInput.addEventListener("input", function () {
+                clearTimeout(pinTimeout);
+
+                const pincode = this.value.trim();
+
+                pinTimeout = setTimeout(() => {
+                    if (pincode.length !== 6 || isNaN(pincode)) {
+                        pinInfo.innerText = "";
+                        pinError.innerText = "";
+                        return;
+                    }
+
+                    fetch(`/account/get-pincode-details/?pincode=${pincode}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.valid) {
+                                pinInfo.innerText = `${data.post_office}, ${data.district}, ${data.state}`;
+                                pinError.innerText = "";
+
+                                // Auto-select state
+                                const stateSelect = document.querySelector('select[name="state"]');
+                                if (stateSelect) {
+                                    for (let i = 0; i < stateSelect.options.length; i++) {
+                                        if (stateSelect.options[i].value.toLowerCase() === data.state.toLowerCase()) {
+                                            stateSelect.selectedIndex = i;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Auto-fill town/city
+                                const cityInput = document.querySelector('input[name="town_city"]');
+                                if (cityInput) {
+                                    cityInput.value = data.district;
+                                }
+                            } else {
+                                pinInfo.innerText = "";
+                                pinError.innerText = "Invalid PIN code";
+                            }
+                        })
+                        .catch(() => {
+                            pinInfo.innerText = "";
+                            pinError.innerText = "Error fetching details";
+                        });
+
+                }, 500);
+            });
+        }
+    });
+</script>
+{% endblock %}

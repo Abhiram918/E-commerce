@@ -1,0 +1,65 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Write a Review - Cliq Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-20 px-6">
+    <div class="bg-white rounded-[32px] shadow-card p-10 border border-gray-50">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-display font-bold text-text-dark">Share Your <span
+                    class="text-primary">Experience</span></h1>
+            <p class="text-gray-500 mt-2">How do you like your new Essential Minimalist Watch?</p>
+        </div>
+
+        <form method="POST" action="" class="space-y-8">
+            {% csrf_token %}
+
+            <div class="text-center">
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Overall
+                    Rating</label>
+                <div class="flex justify-center gap-2 text-gray-200">
+                    {% for i in "12345" %}
+                    <button type="button"
+                        class="material-symbols-outlined text-4xl hover:text-accent transition-colors cursor-pointer focus:text-accent">star</button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Review
+                        Headline</label>
+                    <input type="text" name="headline" placeholder="Summarize your experience in one sentence"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Detailed
+                        Feedback</label>
+                    <textarea name="content" rows="5" placeholder="What did you like or dislike? How's the quality?"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Add a Photo
+                        (Optional)</label>
+                    <div class="flex items-center justify-center w-full">
+                        <label
+                            class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:bg-gray-50 transition-colors">
+                            <span class="material-symbols-outlined text-gray-400 text-3xl">add_a_photo</span>
+                            <span class="text-xs font-bold text-gray-400 mt-2 uppercase tracking-tighter">Upload
+                                Image</span>
+                            <input type="file" class="hidden" />
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-primary hover:bg-secondary text-white font-bold py-4 rounded-full shadow-lg transition-transform hover:-translate-y-1">
+                Post Review
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

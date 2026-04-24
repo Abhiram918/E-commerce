@@ -1,0 +1,493 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Your Orders - Cliq Mart{% endblock %}
+
+{% block extra_css %}
+.sidebar-link {
+transition: all 0.2s ease-in-out;
+}
+.sidebar-link:hover, .sidebar-link.active {
+background-color: #F0F4F0;
+color: #005F02;
+font-weight: 600;
+}
+.sidebar-link.active {
+border-left: 4px solid #005F02;
+}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+    <nav aria-label="Breadcrumb" class="flex text-sm text-gray-600 mb-6">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+                    <span class="material-symbols-outlined text-sm mr-1">home</span>
+                    Home
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    {% if request.user.role == 'SELLER' %}
+                    <a class="ml-1 font-medium text-gray-900 hover:text-primary transition-colors md:ml-2" href="{% url 'account:profile' %}">Seller Central</a>
+                    {% else %}
+                    <a class="ml-1 font-medium text-gray-900 hover:text-primary transition-colors md:ml-2" href="#">Your Account</a>
+                    {% endif %}
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <span class="ml-1 font-medium text-gray-500 md:ml-2">{% if request.user.role == 'SELLER' %}Orders &amp; Shipping{% else %}Your Orders{% endif %}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    <div class="flex flex-col lg:flex-row gap-8">
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-[16px] shadow-sm overflow-hidden sticky top-24">
+
+                {% if request.user.role == 'SELLER' %}
+                <!-- ── Seller Sidebar ── -->
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">
+                            {{ request.user.sellerprofile.store_name|default:"S"|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">{{ request.user.sellerprofile.store_name|default:"Your Store" }}</h2>
+                            <p class="text-gray-200 text-sm">Seller ID: #{{ request.user.id }}</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="py-2">
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'account:profile' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">dashboard</span>
+                        Dashboard
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'products:seller_products' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">inventory_2</span>
+                        Inventory
+                    </a>
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">local_shipping</span>
+                        Orders &amp; Shipping
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">campaign</span>
+                        Advertising
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">payments</span>
+                        Payments
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'products:add_product' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">post_add</span>
+                        Add Product
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">store</span>
+                        Store Settings
+                    </a>
+                </nav>
+
+                {% else %}
+                <!-- ── Customer Sidebar ── -->
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">
+                            {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}</div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">Hello, {{ request.user.first_name|default:request.user.username }}</h2>
+                            <p class="text-gray-200">Member since {{ request.user.date_joined|date:"Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="py-2">
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3">shopping_bag</span>
+                        My Orders
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:wishlist' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">favorite</span>
+                        Wishlist
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:address_book' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">location_on</span>
+                        Address Book
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">manage_accounts</span>
+                        Account Settings
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                        href="{% url 'account:reviews' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">rate_review</span>
+                        My Reviews
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">headset_mic</span>
+                        Customer Support
+                    </a>
+                </nav>
+                {% endif %}
+
+                <div class="p-4 border-t border-gray-100">
+                    <a href="{% url 'account:logout' %}"
+                        class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </aside>
+        <div class="flex-1">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <h1 class="text-2xl font-display font-bold text-primary">Your Orders</h1>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <label class="text-sm font-medium text-gray-700 whitespace-nowrap" for="sort-orders">Sort
+                        by:</label>
+                    <div class="relative w-full md:w-48">
+                        <form id="sort-form" method="GET">
+                            {% if current_filter %}<input type="hidden" name="filter" value="{{ current_filter }}">{% endif %}
+                            <select name="sort" onchange="document.getElementById('sort-form').submit();"
+                                class="block w-full rounded-lg border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-secondary focus:ring-secondary"
+                                id="sort-orders">
+                                <option value="latest" {% if current_sort == 'latest' %}selected{% endif %}>Latest to Oldest</option>
+                                <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest to Latest</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-6 border-b border-gray-200">
+                <nav class="-mb-px flex space-x-6 overflow-x-auto no-scrollbar" role="tablist">
+                    <a href="?filter=all{% if current_sort %}&sort={{ current_sort }}{% endif %}"
+                        class="{% if current_filter == 'all' or not current_filter %}border-b-2 border-secondary text-primary font-semibold{% else %}border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 font-medium{% endif %} whitespace-nowrap pb-3 px-1 text-sm transition-colors"
+                        role="tab">
+                        All Orders
+                    </a>
+                    <a href="?filter=active{% if current_sort %}&sort={{ current_sort }}{% endif %}"
+                        class="{% if current_filter == 'active' %}border-b-2 border-secondary text-primary font-semibold{% else %}border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 font-medium{% endif %} whitespace-nowrap pb-3 px-1 text-sm transition-colors"
+                        role="tab">
+                        Active
+                    </a>
+                    <a href="?filter=cancelled{% if current_sort %}&sort={{ current_sort }}{% endif %}"
+                        class="{% if current_filter == 'cancelled' %}border-b-2 border-secondary text-primary font-semibold{% else %}border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 font-medium{% endif %} whitespace-nowrap pb-3 px-1 text-sm transition-colors"
+                        role="tab">
+                        Cancelled
+                    </a>
+                    <a href="?filter=returned{% if current_sort %}&sort={{ current_sort }}{% endif %}"
+                        class="{% if current_filter == 'returned' %}border-b-2 border-secondary text-primary font-semibold{% else %}border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 font-medium{% endif %} whitespace-nowrap pb-3 px-1 text-sm transition-colors"
+                        role="tab">
+                        Returned
+                    </a>
+                </nav>
+            </div>
+            <div class="space-y-6">
+                {% for order in orders %}
+                <div class="bg-white rounded-[12px] shadow-card border border-gray-100 overflow-hidden">
+                    <div
+                        class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex flex-wrap gap-y-2 justify-between items-center text-sm text-gray-600">
+                        <div class="flex gap-8">
+                            <div class="flex flex-col">
+                                <span class="text-xs uppercase font-bold text-gray-500">Order Placed</span>
+                                <span class="font-medium text-gray-800">{{ order.created_at|date:"F d, Y" }}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-xs uppercase font-bold text-gray-500">Total</span>
+                                <span class="font-medium text-gray-800">${{ order.total_amount }}</span>
+                            </div>
+                            <div class="hidden sm:flex flex-col">
+                                <span class="text-xs uppercase font-bold text-gray-500">Ship To</span>
+                                <div class="group relative inline-block">
+                                    <span
+                                        class="font-medium text-secondary cursor-pointer border-b border-dashed border-secondary hover:text-primary">
+                                        {{ order.shippingaddress.full_name|default:order.user.get_full_name|default:order.user.username }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs uppercase font-bold text-gray-500">Order # {{ order.order_id }}</span>
+                            <div class="flex gap-2 text-secondary text-xs mt-1">
+                                <a class="hover:underline hover:text-primary" href="{% url 'orders:track_order' order.id %}">View Details</a>
+                                {% if order.status == 'DELIVERED' or order.status == 'RETURNED' %}
+                                <span class="text-gray-300">|</span>
+                                <a class="hover:underline hover:text-primary" href="{% url 'orders:invoice' order.id %}">Invoice</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex flex-col lg:flex-row gap-6">
+                            <div class="flex-1 {% if order.items.count > 1 %}space-y-6{% endif %}">
+                                <div class="mb-4">
+                                    <h3 class="font-bold text-xl {% if order.status == 'CANCELLED' %}text-red-600{% elif order.status == 'DELIVERED' %}text-primary{% else %}text-secondary{% endif %} mb-1">
+                                        {% if order.status == 'DELIVERED' %}Delivered {{ order.created_at|date:"M d" }}{% elif order.status == 'CANCELLED' %}Cancelled{% else %}Arriving Soon{% endif %}
+                                    </h3>
+                                    <p class="text-sm text-gray-500">
+                                        {% if order.status == 'DELIVERED' %}Package was handed to resident{% elif order.status == 'CANCELLED' %}You requested a cancellation{% else %}Not yet shipped{% endif %}
+                                    </p>
+                                </div>
+                                {% for item in order.items.all %}
+                                <div
+                                    class="flex gap-4 {% if not forloop.first %}pt-4 border-t border-gray-100{% endif %}">
+                                    <div
+                                        class="h-24 w-24 flex-shrink-0 bg-gray-50 rounded-lg p-2 border border-gray-100">
+                                        {% if item.product.images.first %}
+                                        <img alt="{{ item.product.name }}"
+                                            class="h-full w-full object-contain mix-blend-multiply"
+                                            src="{{ item.product.images.first.image.url }}" />
+                                        {% else %}
+                                        <div class="w-full h-full flex items-center justify-center text-gray-200">
+                                            <span class="material-symbols-outlined text-4xl">inventory_2</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-1">
+                                        <a class="text-secondary font-semibold hover:text-primary hover:underline line-clamp-2 mb-1"
+                                            href="#">
+                                            {{ item.product.name }}
+                                        </a>
+                                        <p class="text-xs text-gray-500 mb-2">Sold by: <span
+                                                class="text-gray-700 font-medium">{{ item.product.seller.first_name|default:item.product.seller.username }}</span></p>
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <button
+                                                class="bg-accent text-primary text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                                                Buy it again
+                                            </button>
+                                            {% if order.status == 'DELIVERED' or order.status == 'RETURNED' %}
+                                            <a href="{% url 'account:write_review' item.product.id %}"
+                                                class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-bold px-3 py-1 rounded-full shadow-sm transition-colors whitespace-nowrap">
+                                                Write a Review
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="w-full lg:w-64 flex flex-col gap-3 flex-shrink-0 pt-2">
+                                {% if request.user.role == 'SELLER' %}
+                                    <form action="{% url 'orders:update_order_status' order.id %}" method="POST" class="w-full flex flex-col gap-2">
+                                        {% csrf_token %}
+                                        <select name="status" class="w-full text-sm rounded-[12px] border-gray-300 focus:border-secondary focus:ring-secondary py-2 px-3">
+                                            <option value="PENDING" {% if order.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                                            <option value="CONFIRMED" {% if order.status == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
+                                            <option value="SHIPPED" {% if order.status == 'SHIPPED' %}selected{% endif %}>Shipped</option>
+                                            <option value="DELIVERED" {% if order.status == 'DELIVERED' %}selected{% endif %}>Delivered</option>
+                                            <option value="CANCELLED" {% if order.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                                        </select>
+                                        <button type="submit" class="w-full bg-primary hover:bg-secondary text-white text-sm font-medium py-2 px-4 rounded-[12px] shadow-sm transition-colors">
+                                            Update Status
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    {% if order.status != 'CANCELLED' %}
+                                    <a href="{% url 'orders:track_order' order.id %}"
+                                        class="w-full bg-secondary hover:bg-primary text-white text-sm font-medium py-2 px-4 rounded-[12px] shadow-sm transition-colors text-center block">
+                                        Track Package
+                                    </a>
+                                    {% if order.status == 'PENDING' or order.status == 'CONFIRMED' %}
+                                    <button type="button" onclick="openCancelModal({{ order.id }})"
+                                            class="w-full bg-white border border-red-300 hover:bg-red-50 text-red-600 text-sm font-medium py-2 px-4 rounded-[12px] shadow-sm transition-colors text-center">
+                                            Cancel Order
+                                    </button>
+                                    {% else %}
+                                    <button type="button" onclick="openReturnModal({{ order.id }})"
+                                        class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium py-2 px-4 rounded-[12px] shadow-sm transition-colors text-center">
+                                        Return or Replace items
+                                    </button>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div
+                    class="bg-white rounded-[12px] shadow-card border border-gray-100 p-12 text-center flex flex-col items-center">
+                    <span class="material-symbols-outlined text-6xl text-gray-200 mb-4">receipt_long</span>
+                    <h2 class="font-display text-2xl font-bold text-gray-900">Your order history is empty</h2>
+                    <p class="text-gray-500 mt-2">Every great collection starts with a single find. Your next favorite
+                        thing is just a click away!</p>
+                    <a href="/"
+                        class="mt-6 px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-secondary transition-colors inline-block">
+                        Explore Marketplace
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if orders %}
+            <div class="mt-8 flex justify-center">
+                <nav aria-label="Pagination" class="flex items-center gap-2">
+                    <button class="p-2 rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <button
+                        class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-sm shadow-md">1</button>
+                    <button
+                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm">2</button>
+                    <button
+                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm">3</button>
+                    <span class="text-gray-400 px-2">...</span>
+                    <button
+                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm">8</button>
+                    <button
+                        class="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-primary">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Order Modal -->
+<div id="cancelOrderModal" class="hidden fixed inset-0 z-[999] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeCancelModal()"></div>
+
+        <!-- Center modal trick -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-[16px] text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+            <form id="cancelOrderForm" method="POST" action="">
+                {% csrf_token %}
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <span class="material-symbols-outlined text-red-600">warning</span>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Cancel Order
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 mb-4">
+                                    Are you sure you want to cancel this order? This action cannot be undone.
+                                </p>
+                                <div class="mb-4">
+                                    <label for="cancel_reason" class="block text-sm font-medium text-gray-700 mb-1">Reason for Cancellation</label>
+                                    <select id="cancel_reason" name="cancel_reason" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm py-2 px-3 border outline-none">
+                                        <option value="" disabled selected>Select a reason...</option>
+                                        <option value="Changed my mind">Changed my mind</option>
+                                        <option value="Found a better price">Found a better price</option>
+                                        <option value="Order placed by mistake">Order placed by mistake</option>
+                                        <option value="Shipping time is too long">Shipping time is too long</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="cancel_comments" class="block text-sm font-medium text-gray-700 mb-1">Additional Comments (Optional)</label>
+                                    <textarea id="cancel_comments" name="cancel_comments" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm py-2 px-3 border outline-none" placeholder="Tell us more about why you're cancelling..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                        Yes, Cancel Order
+                    </button>
+                    <button type="button" onclick="closeCancelModal()" class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                        Keep Order
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Return Order Modal -->
+<div id="returnOrderModal" class="hidden fixed inset-0 z-[999] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeReturnModal()"></div>
+
+        <!-- Center modal trick -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-[16px] text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+            <form id="returnOrderForm" method="POST" action="">
+                {% csrf_token %}
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <span class="material-symbols-outlined text-blue-600">assignment_return</span>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Return Item
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 mb-4">
+                                    Why do you want to return this product?
+                                </p>
+                                <div class="mb-4">
+                                    <label for="return_reason" class="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                                    <select id="return_reason" name="return_reason" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm py-2 px-3 border outline-none">
+                                        <option value="" disabled selected>Select a reason...</option>
+                                        <option value="Damaged product">Damaged product</option>
+                                        <option value="Wrong item delivered">Wrong item delivered</option>
+                                        <option value="Not as expected">Not as expected</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="return_comments" class="block text-sm font-medium text-gray-700 mb-1">Additional details (Optional)</label>
+                                    <textarea id="return_comments" name="return_comments" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm py-2 px-3 border outline-none" placeholder="Elaborate on the issue..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                        Submit Return request
+                    </button>
+                    <button type="button" onclick="closeReturnModal()" class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                        Close
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openCancelModal(orderId) {
+        document.getElementById('cancelOrderForm').action = `/orders/cancel/${orderId}/`;
+        document.getElementById('cancelOrderModal').classList.remove('hidden');
+    }
+
+    function closeCancelModal() {
+        document.getElementById('cancelOrderModal').classList.add('hidden');
+    }
+
+    function openReturnModal(orderId) {
+        document.getElementById('returnOrderForm').action = `/orders/return/${orderId}/`;
+        document.getElementById('returnOrderModal').classList.remove('hidden');
+    }
+
+    function closeReturnModal() {
+        document.getElementById('returnOrderModal').classList.add('hidden');
+    }
+</script>
+{% endblock %}

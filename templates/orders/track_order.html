@@ -1,0 +1,244 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Track Package - Cliq Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-[1000px] mx-auto px-4 md:px-6 py-8">
+    
+    <nav aria-label="Breadcrumb" class="flex text-sm text-gray-600 mb-6">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+                    <span class="material-symbols-outlined text-sm mr-1">home</span>
+                    Home
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <a class="ml-1 font-medium text-gray-500 hover:text-primary transition-colors md:ml-2" href="{% url 'account:profile' %}">Your Account</a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <a class="ml-1 font-medium text-gray-500 hover:text-primary transition-colors md:ml-2" href="{% url 'account:profile' %}">Your Orders</a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <span class="ml-1 font-bold text-gray-900 md:ml-2">Track Package</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Head tracker card -->
+    <div class="bg-white rounded-[16px] shadow-card border border-gray-100 p-8 mb-6">
+        <h1 class="text-3xl font-display font-bold text-primary mb-2">
+            {% if order.status == 'DELIVERED' %}
+                Delivered
+            {% elif order.status == 'SHIPPED' %}
+                Shipped - Arriving Soon
+            {% elif order.status == 'CONFIRMED' %}
+                Confirmed - Preparing for shipment
+            {% elif order.status == 'CANCELLED' %}
+                Cancelled
+            {% else %}
+                Pending Confirmation
+            {% endif %}
+        </h1>
+        <p class="text-primary font-medium text-md mb-12">
+            {% if order.status == 'DELIVERED' %}
+                Your package has arrived
+            {% elif order.status == 'SHIPPED' %}
+                On the way
+            {% elif order.status == 'CONFIRMED' %}
+                Seller is preparing your package
+            {% elif order.status == 'CANCELLED' %}
+                <span class="text-red-500">This order has been cancelled</span>
+            {% else %}
+                Waiting for seller confirmation
+            {% endif %}
+        </p>
+
+        {% if order.status != 'CANCELLED' %}
+        <!-- Progress Bar -->
+        <div class="relative flex items-center justify-between w-full max-w-3xl mx-auto mb-10 mt-6 z-0">
+            <!-- Background base line -->
+            <div class="absolute left-8 right-8 top-1/2 -translate-y-1/2 h-1 bg-gray-200 -z-10"></div>
+            
+            <!-- Progress line -->
+            <div class="absolute left-8 top-1/2 -translate-y-1/2 h-1 bg-primary -z-10 transition-all duration-500" 
+                 style="width: {% if order.status == 'DELIVERED' %}100%{% elif order.status == 'SHIPPED' %}66%{% elif order.status == 'CONFIRMED' %}33%{% else %}0%{% endif %};">
+            </div>
+            
+            <!-- Ordered step -->
+            <div class="flex flex-col items-center flex-1">
+                <div class="w-8 h-8 rounded-full {% if order.status == 'PENDING' %}bg-white border-4 border-primary text-primary{% else %}bg-primary text-white{% endif %} flex items-center justify-center mb-2 shadow-sm">
+                    {% if order.status == 'PENDING' %}
+                    <span class="material-symbols-outlined text-[16px] font-bold">shopping_cart</span>
+                    {% else %}
+                    <span class="material-symbols-outlined text-[16px] font-bold">check</span>
+                    {% endif %}
+                </div>
+                <span class="text-xs font-bold text-primary">Ordered</span>
+            </div>
+
+            <!-- Confirmed step -->
+            <div class="flex flex-col items-center flex-1">
+                <div class="w-8 h-8 rounded-full {% if order.status == 'CONFIRMED' %}bg-white border-4 border-primary text-primary{% elif order.status == 'SHIPPED' or order.status == 'DELIVERED' %}bg-primary text-white{% else %}bg-white border-2 border-gray-300 text-gray-400{% endif %} flex items-center justify-center mb-2 shadow-sm transition-colors duration-300">
+                    {% if order.status == 'SHIPPED' or order.status == 'DELIVERED' %}
+                    <span class="material-symbols-outlined text-[16px] font-bold">check</span>
+                    {% elif order.status == 'CONFIRMED' %}
+                    <span class="material-symbols-outlined text-[16px] font-bold">fact_check</span>
+                    {% else %}
+                    <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                    {% endif %}
+                </div>
+                <span class="text-xs font-bold {% if order.status == 'PENDING' %}text-gray-400{% else %}text-primary{% endif %}">Confirmed</span>
+            </div>
+
+            <!-- Shipped step -->
+            <div class="flex flex-col items-center flex-1">
+                <div class="w-8 h-8 rounded-full {% if order.status == 'SHIPPED' %}bg-white border-4 border-primary text-primary{% elif order.status == 'DELIVERED' %}bg-primary text-white{% else %}bg-white border-2 border-gray-300 text-gray-400{% endif %} flex items-center justify-center mb-2 shadow-sm transition-colors duration-300">
+                     {% if order.status == 'DELIVERED' %}
+                     <span class="material-symbols-outlined text-[16px] font-bold">check</span>
+                     {% elif order.status == 'SHIPPED' %}
+                     <span class="material-symbols-outlined text-[16px] font-bold">local_shipping</span>
+                     {% else %}
+                     <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                     {% endif %}
+                </div>
+                <span class="text-xs font-bold {% if order.status == 'SHIPPED' or order.status == 'DELIVERED' %}text-primary{% else %}text-gray-400{% endif %}">Shipped</span>
+            </div>
+
+            <!-- Delivered step -->
+            <div class="flex flex-col items-center flex-1">
+                <div class="w-8 h-8 rounded-full {% if order.status == 'DELIVERED' %}bg-primary text-white{% else %}bg-white border-2 border-gray-300 text-gray-400{% endif %} flex items-center justify-center mb-2">
+                    {% if order.status == 'DELIVERED' %}
+                    <span class="material-symbols-outlined text-[16px] font-bold">inventory_2</span>
+                    {% else %}
+                    <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                    {% endif %}
+                </div>
+                <span class="text-xs font-bold {% if order.status == 'DELIVERED' %}text-primary{% else %}text-gray-400{% endif %}">
+                    Delivered
+                </span>
+            </div>
+        </div>
+        {% endif %}
+
+        {% with first_item=order.items.first %}
+        {% if first_item %}
+        <div class="flex items-center gap-4 mt-12 bg-gray-50/50 rounded-xl p-4 border border-gray-100/80 max-w-2xl">
+            <div class="w-20 h-20 flex-shrink-0 bg-white rounded-lg p-2 border border-gray-100 shadow-sm">
+                {% if first_item.product.images.first %}
+                <img alt="{{ first_item.product.name }}" class="w-full h-full object-contain mix-blend-multiply" src="{{ first_item.product.images.first.image.url }}" />
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center text-gray-200">
+                    <span class="material-symbols-outlined text-3xl">inventory_2</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="flex-1">
+                <h3 class="font-bold text-primary font-display text-lg tracking-tight">{{ first_item.product.name }}</h3>
+                <p class="text-sm text-gray-500 mt-1">Sold by: <span class="font-medium text-gray-700">{{ first_item.product.seller.first_name|default:first_item.product.seller.username }}</span></p>
+                <div class="text-sm text-gray-600 mt-1 font-medium">Qty: {{ first_item.quantity }} <span class="mx-2 text-gray-300">|</span> ${{ first_item.price }}</div>
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Tracking details card -->
+    <div class="bg-white rounded-[16px] shadow-card border border-gray-100 p-8">
+        <h2 class="font-bold text-gray-800 text-xl font-display">Tracking Details</h2>
+        <p class="text-sm text-gray-500 mb-8 mt-1">Tracking ID: TBA{{ order.order_id }}304</p>
+        
+        <div class="relative border-l-2 border-gray-100 ml-3 space-y-10 pb-4">
+            
+            {% if order.status == 'CANCELLED' %}
+            <div class="relative pl-8">
+                <div class="absolute left-[-9px] top-1 w-4 h-4 rounded-full bg-red-500 border-[3px] border-white shadow-sm"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-red-600 text-[15px]">Order Cancelled</h4>
+                        <p class="text-sm text-gray-500 mt-1">This order has been cancelled.</p>
+                        <p class="text-xs text-gray-400 mt-2 font-medium">Cancelled</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if order.status == 'DELIVERED' %}
+            <div class="relative pl-8">
+                <div class="absolute left-[-9px] top-1 w-4 h-4 rounded-full bg-primary border-[3px] border-white shadow-sm"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-[15px]">Delivered</h4>
+                        <p class="text-sm text-gray-500 mt-1">Package has been delivered successfully.</p>
+                        <p class="text-xs text-gray-400 mt-2 font-medium">Completed</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if order.status == 'SHIPPED' or order.status == 'DELIVERED' %}
+            <div class="relative pl-8">
+                <div class="absolute left-[-9px] top-1 w-4 h-4 rounded-full bg-primary border-[3px] border-white shadow-sm"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-[15px]">Shipped</h4>
+                        <p class="text-sm text-gray-500 mt-1">The package has been shipped and is on its way.</p>
+                        <p class="text-xs text-gray-400 mt-2 font-medium">In transit</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if order.status == 'CONFIRMED' or order.status == 'SHIPPED' or order.status == 'DELIVERED' %}
+            <div class="relative pl-8">
+                <div class="absolute left-[-9px] top-1 w-4 h-4 rounded-full bg-primary border-[3px] border-white shadow-sm"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-[15px]">Order Confirmed</h4>
+                        <p class="text-sm text-gray-500 mt-1">Your order has been confirmed and is being prepared for shipment.</p>
+                        <p class="text-xs text-gray-400 mt-2 font-medium">Processing</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="relative pl-8">
+                <div class="absolute left-[-9px] top-1 w-4 h-4 rounded-full bg-primary border-[3px] border-white shadow-sm"></div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-[15px]">Order Placed</h4>
+                        <p class="text-sm text-gray-500 mt-1">Your order has been received and is pending confirmation.</p>
+                        <p class="text-xs text-gray-400 mt-2 font-medium">{{ order.created_at|date:"F j, Y" }}</p>
+                    </div>
+                    <span class="text-xs text-gray-500 font-medium whitespace-nowrap">{{ order.created_at|date:"g:i A" }}</span>
+                </div>
+            </div>
+            
+            <!-- See all updates link -->
+            <div class="mt-8 pt-4 pl-4 border-t border-gray-100/50 w-full hidden">
+                 <button class="flex items-center text-primary font-bold text-sm hover:text-secondary transition-colors">
+                     <span class="material-symbols-outlined text-[18px] mr-1">expand_more</span>
+                     See all updates
+                 </button>
+            </div>
+            
+        </div>
+        
+        <button class="flex items-center text-primary font-bold text-sm hover:text-secondary transition-colors mt-6">
+             <span class="material-symbols-outlined text-[18px] mr-1">expand_more</span>
+             See all updates
+        </button>
+        
+    </div>
+</div>
+{% endblock %}

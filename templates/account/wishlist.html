@@ -1,0 +1,160 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Wishlist - Cliq Mart {% endblock %}
+
+{% block extra_css %}
+.sidebar-link {
+    transition: all 0.2s ease-in-out;
+}
+.sidebar-link:hover, .sidebar-link.active {
+    background-color: #F0F4F0;
+    color: #005F02;
+    font-weight: 600;
+}
+.sidebar-link.active {
+    border-left: 4px solid #005F02;
+}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+    <nav aria-label="Breadcrumb" class="flex text-sm text-gray-600 mb-6">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+                    <span class="material-symbols-outlined text-sm mr-1">home</span>
+                    Home
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <a class="ml-1 font-medium text-gray-900 hover:text-primary transition-colors md:ml-2" href="{% url 'account:profile' %}">Your Account</a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <span class="ml-1 font-medium text-gray-500 md:ml-2">Wishlist</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    <div class="flex flex-col lg:flex-row gap-8">
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-[16px] shadow-sm overflow-hidden sticky top-24">
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">{{ request.user.first_name|default:request.user.username|slice:":1"|upper }}</div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">Hello, {{ request.user.first_name|default:request.user.username }}</h2>
+                            <p class="text-xs text-gray-200">Member since {{ request.user.date_joined|date:"Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="py-2">
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">shopping_bag</span>
+                        My Orders
+                    </a>
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:wishlist' %}">
+                        <span class="material-symbols-outlined mr-3">favorite</span>
+                        Wishlist
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:address_book' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">location_on</span>
+                        Address Book
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">manage_accounts</span>
+                        Account Settings
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:reviews' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">rate_review</span>
+                        My Reviews
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">headset_mic</span>
+                        Customer Support
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-gray-100">
+                    <a href="{% url 'account:logout' %}" class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </aside>
+        <div class="flex-1">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <h1 class="text-2xl font-display font-bold text-primary">Your Wishlist</h1>
+            </div>
+            
+            <div class="space-y-6">
+                {% if wishlist_items %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for item in wishlist_items %}
+                        <div class="bg-white rounded-[24px] overflow-hidden shadow-card hover:shadow-xl transition-all border border-gray-50 group flex flex-col h-full relative">
+                            <div class="aspect-[4/5] bg-gray-100 relative overflow-hidden">
+                                {% if item.product.images.first %}
+                                <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                {% else %}
+                                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                    <span class="text-gray-400">No Image</span>
+                                </div>
+                                {% endif %}
+
+                                <form action="{% url 'account:remove_from_wishlist' item.product.id %}" method="get" class="absolute top-3 right-3 z-10">
+                                    <button type="submit" class="bg-white text-red-500 w-8 h-8 rounded-full shadow-md flex items-center justify-center hover:bg-red-50 transition-colors" title="Remove from Wishlist">
+                                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                                    </button>
+                                </form>
+                                
+                                <div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                    <a href="{% url 'products:product_detail' slug=item.product.slug %}" class="w-10 h-10 bg-white text-primary rounded-full shadow-lg flex items-center justify-center hover:bg-accent transition-colors">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="p-6 flex flex-col flex-grow">
+                                <div class="mb-2">
+                                    <p class="text-xs font-bold text-gray-400 uppercase">{{ item.product.category.name|default:"Uncategorized" }}</p>
+                                    <h4 class="font-display font-bold text-text-dark text-lg group-hover:text-primary transition-colors cursor-pointer" onclick="window.location.href='{% url 'products:product_detail' slug=item.product.slug %}'">{{ item.product.name }}</h4>
+                                    <div class="flex items-center gap-1 mt-1">
+                                        <span class="material-symbols-outlined text-[14px] text-yellow-400" style="font-variation-settings: 'FILL' 1;">star</span>
+                                        <span class="text-xs font-bold text-gray-700">{{ item.product.average_rating|default:"0" }}</span>
+                                        <span class="text-xs text-gray-400">({{ item.product.reviews_count }})</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between mt-auto pt-4">
+                                    <span class="text-2xl font-display font-bold text-primary">${{ item.product.selling_price }}</span>
+                                    <form action="{% url 'orders:add_to_cart' item.product.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 transition-all">
+                                            <span class="material-symbols-outlined text-sm">shopping_cart</span> Add
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                <div class="bg-white rounded-[12px] shadow-card border border-gray-100 p-12 text-center flex flex-col items-center">
+                    <span class="material-symbols-outlined text-6xl text-gray-200 mb-4">favorite_border</span>
+                    <h2 class="font-display text-2xl font-bold text-gray-900">Your wishlist is empty</h2>
+                    <p class="text-gray-500 mt-2">Save items you like in your wishlist to buy them later.</p>
+                    <a href="/" class="mt-6 px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-secondary transition-colors inline-block">
+                        Explore Marketplace
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

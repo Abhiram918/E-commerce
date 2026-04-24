@@ -1,0 +1,377 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Payments — Seller Central | Cliq Mart{% endblock %}
+
+{% block extra_css %}
+/* ── Sidebar ── */
+.sidebar-link { transition: all 0.2s ease-in-out; }
+.sidebar-link:hover, .sidebar-link.active {
+    background-color: #F0F4F0;
+    color: #005F02;
+    font-weight: 600;
+}
+.sidebar-link.active { border-left: 4px solid #005F02; }
+
+/* ── KPI Cards ── */
+.kpi-card {
+    background: linear-gradient(135deg, #fff 0%, #f9fdf9 100%);
+    border: 1px solid rgba(0,95,2,0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: box-shadow 0.25s, transform 0.25s;
+}
+.kpi-card:hover { box-shadow: 0 8px 32px rgba(0,95,2,0.12); transform: translateY(-2px); }
+
+/* ── Table ── */
+.payments-table th {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
+    padding: 0.75rem 1rem;
+    background: #f9fafb;
+}
+.payments-table td {
+    padding: 0.85rem 1rem;
+    vertical-align: top;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+}
+.payments-table tr:last-child td { border-bottom: none; }
+.payments-table tbody tr { transition: background 0.15s; }
+.payments-table tbody tr:hover { background: #f9fdf9; }
+
+/* ── Status badges ── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.badge-success { background: #dcfce7; color: #166534; }
+.badge-pending { background: #fef9c3; color: #854d0e; }
+.badge-failed  { background: #fee2e2; color: #991b1b; }
+
+/* ── Method chip ── */
+.method-chip {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.7rem; font-weight: 600;
+    background: #eff6ff; color: #1d4ed8;
+}
+.method-chip.cod { background: #fef3c7; color: #92400e; }
+
+/* ── Empty state ── */
+.empty-state { padding: 4rem 2rem; text-align: center; color: #9ca3af; }
+
+/* ── Detail accordion ── */
+.accordion-body { display: none; }
+.accordion-body.open { display: table-row; }
+
+/* ── Progress bar ── */
+.pbar-bg { background: #e5e7eb; border-radius: 9999px; height: 6px; }
+.pbar-fill { height: 6px; border-radius: 9999px; background: linear-gradient(90deg, #005F02, #427A43); }
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+
+    <!-- Breadcrumbs -->
+    <nav aria-label="Breadcrumb" class="flex text-sm text-gray-600 mb-6">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+                    <span class="material-symbols-outlined text-sm mr-1">home</span>Home
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <a class="ml-1 hover:text-primary transition-colors md:ml-2" href="{% url 'account:profile' %}">Seller Central</a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <span class="ml-1 font-medium text-gray-500 md:ml-2">Payments</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- ── Sidebar ── -->
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-[16px] shadow-sm overflow-hidden sticky top-24">
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">
+                            {{ request.user.sellerprofile.store_name|default:"S"|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">{{ request.user.sellerprofile.store_name|default:"Your Store" }}</h2>
+                            <p class="text-gray-200 text-sm">Seller ID: #{{ request.user.id }}</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="py-2">
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'account:profile' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">dashboard</span>Dashboard
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'products:seller_products' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">inventory_2</span>Inventory
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">local_shipping</span>Orders &amp; Shipping
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">campaign</span>Advertising
+                    </a>
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'account:seller_payments' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">payments</span>Payments
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'products:add_product' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">post_add</span>Add Product
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">store</span>Store Settings
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-gray-100">
+                    <a href="{% url 'account:logout' %}"
+                       class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">logout</span>Sign Out
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ── Main Content ── -->
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl font-display font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">payments</span> Payment Dashboard
+                </h1>
+                <span class="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
+                    Commission rate: {{ request.user.sellerprofile.commission_rate|default:"10" }}%
+                </span>
+            </div>
+
+            <!-- ── KPI Summary Row ── -->
+            <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+
+                <div class="kpi-card flex items-start gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-green-100 text-green-700 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined">account_balance_wallet</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 mb-1">Gross Revenue</p>
+                        <p class="text-2xl font-bold text-primary">₹{{ total_gross }}</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">{{ total_orders }} order{{ total_orders|pluralize }}</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card flex items-start gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined">percent</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 mb-1">Platform Commission</p>
+                        <p class="text-2xl font-bold text-red-600">₹{{ total_commission }}</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Deducted from gross</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card flex items-start gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined">savings</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 mb-1">Net Earnings</p>
+                        <p class="text-2xl font-bold text-blue-700">₹{{ total_net }}</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">After deductions</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card flex items-start gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-yellow-100 text-yellow-700 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined">pending</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 mb-1">Pending Payments</p>
+                        <p class="text-2xl font-bold text-yellow-700">{{ pending_count }}</p>
+                        <p class="text-[11px] text-green-600 mt-0.5">{{ paid_count }} settled</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ── Collection progress ── -->
+            {% if total_orders > 0 %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-sm font-semibold text-gray-700">Collection Progress</p>
+                    <p class="text-sm font-bold text-primary">{{ paid_count }} / {{ total_orders }} Settled</p>
+                </div>
+                <div class="pbar-bg">
+                    {% if total_orders %}
+                    <div class="pbar-fill" style="width: {% widthratio paid_count total_orders 100 %}%"></div>
+                    {% endif %}
+                </div>
+                <p class="text-[11px] text-gray-400 mt-1">
+                    {% widthratio paid_count total_orders 100 %}% of orders have been fully paid
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- ── Payments Table ── -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                    <h2 class="font-display font-bold text-lg text-primary flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">receipt_long</span> Transaction History
+                    </h2>
+                    <span class="text-xs text-gray-400">{{ total_orders }} record{{ total_orders|pluralize }}</span>
+                </div>
+
+                {% if rows %}
+                <div class="overflow-x-auto">
+                    <table class="payments-table w-full">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Order</th>
+                                <th class="text-left">Customer</th>
+                                <th class="text-left">Date</th>
+                                <th class="text-left">Method</th>
+                                <th class="text-right">Gross (₹)</th>
+                                <th class="text-right">Commission (₹)</th>
+                                <th class="text-right">Net (₹)</th>
+                                <th class="text-left">Status</th>
+                                <th class="text-left">Transaction ID</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-tbody">
+                            {% for row in rows %}
+                            <!-- ── Main row ── -->
+                            <tr class="cursor-pointer" onclick="toggleItems('items-{{ forloop.counter }}', this)">
+                                <td class="font-mono text-xs font-semibold text-primary">
+                                    {{ row.order.order_id }}
+                                </td>
+                                <td>
+                                    <div class="font-medium text-gray-800">{{ row.order.user.get_full_name|default:row.order.user.username }}</div>
+                                    <div class="text-[11px] text-gray-400">{{ row.order.user.email }}</div>
+                                </td>
+                                <td class="text-gray-600 text-xs">
+                                    {{ row.order.created_at|date:"d M Y" }}<br>
+                                    <span class="text-gray-400">{{ row.order.created_at|time:"h:i A" }}</span>
+                                </td>
+                                <td>
+                                    {% if row.payment_method == 'COD' %}
+                                        <span class="method-chip cod">
+                                            <span class="material-symbols-outlined text-xs">payments</span>COD
+                                        </span>
+                                    {% else %}
+                                        <span class="method-chip">
+                                            <span class="material-symbols-outlined text-xs">credit_card</span>Card
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-right font-semibold text-gray-800">{{ row.gross }}</td>
+                                <td class="text-right text-red-500 font-medium">{{ row.commission }}</td>
+                                <td class="text-right font-bold text-green-700">{{ row.net }}</td>
+                                <td>
+                                    {% if row.payment_status == 'SUCCESS' %}
+                                        <span class="badge badge-success">
+                                            <span class="material-symbols-outlined text-[10px]">check_circle</span>Paid
+                                        </span>
+                                    {% elif row.payment_status == 'FAILED' %}
+                                        <span class="badge badge-failed">
+                                            <span class="material-symbols-outlined text-[10px]">cancel</span>Failed
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-pending">
+                                            <span class="material-symbols-outlined text-[10px]">schedule</span>Pending
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="font-mono text-xs text-gray-500">{{ row.transaction_id }}</td>
+                                <td class="text-gray-400">
+                                    <span class="material-symbols-outlined text-base toggle-icon-{{ forloop.counter }}">expand_more</span>
+                                </td>
+                            </tr>
+
+                            <!-- ── Expanded product items ── -->
+                            <tr id="items-{{ forloop.counter }}" class="accordion-body bg-gray-50">
+                                <td colspan="10" class="px-6 py-4">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase mb-3 tracking-wider">Products in this order</p>
+                                    <div class="space-y-2">
+                                        {% for item in row.items %}
+                                        <div class="flex items-center gap-4 bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
+                                            {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
+                                                 class="w-12 h-12 rounded-lg object-cover flex-shrink-0 border border-gray-100">
+                                            {% else %}
+                                            <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                                <span class="material-symbols-outlined text-gray-400">image</span>
+                                            </div>
+                                            {% endif %}
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-semibold text-gray-800 text-sm truncate">{{ item.product.name }}</p>
+                                                <p class="text-xs text-gray-500">SKU: {{ item.product.id }} &bull; Qty: {{ item.quantity }}</p>
+                                            </div>
+                                            <div class="text-right flex-shrink-0">
+                                                <p class="font-bold text-primary text-sm">₹{{ item.total_price }}</p>
+                                                <p class="text-xs text-gray-400">₹{{ item.price }} × {{ item.quantity }}</p>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% else %}
+                <!-- ── Empty State ── -->
+                <div class="empty-state">
+                    <span class="material-symbols-outlined text-6xl text-gray-300 mb-4 block">payments</span>
+                    <h3 class="text-lg font-semibold text-gray-500 mb-2">No Payments Yet</h3>
+                    <p class="text-sm text-gray-400 mb-6">You haven't sold any products yet. Once orders are placed, payment details will appear here.</p>
+                    <a href="{% url 'products:add_product' %}"
+                       class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-secondary transition-colors">
+                        <span class="material-symbols-outlined text-base">add_circle</span>Add Your First Product
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+        </div><!-- /main content -->
+    </div><!-- /flex row -->
+</div><!-- /container -->
+
+<script>
+function toggleItems(rowId, triggerRow) {
+    const body = document.getElementById(rowId);
+    const num  = rowId.split('-')[1];
+    const icon = triggerRow.querySelector('.toggle-icon-' + num);
+
+    if (body.classList.contains('open')) {
+        body.classList.remove('open');
+        icon.textContent = 'expand_more';
+    } else {
+        body.classList.add('open');
+        icon.textContent = 'expand_less';
+    }
+}
+</script>
+{% endblock %}

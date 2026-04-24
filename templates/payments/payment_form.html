@@ -1,0 +1,105 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Secure Payment - Cliq Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-[1000px] mx-auto px-4 py-16 min-h-[80vh] flex flex-col items-center">
+
+    <div class="flex items-center gap-2 mb-8 bg-green-50 px-4 py-2 rounded-full border border-green-100 shadow-sm">
+        <span class="material-symbols-outlined text-green-600 text-sm">lock</span>
+        <span class="text-[10px] font-bold text-green-700 uppercase tracking-widest">256-bit SSL Encrypted
+            Payment</span>
+    </div>
+
+    <div class="w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+        <div class="bg-white rounded-[32px] p-8 md:p-10 shadow-card border border-gray-50 relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-2xl font-display font-bold text-text-dark mb-8">Payment <span
+                        class="text-primary">Method</span></h2>
+
+                <form method="POST" id="payment-form" class="space-y-6">
+                    {% csrf_token %}
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Card Number</label>
+                        <div class="relative">
+                            <input type="text" placeholder="0000 0000 0000 0000"
+                                class="w-full pl-4 pr-12 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none font-mono">
+                            <span
+                                class="absolute right-4 top-3.5 material-symbols-outlined text-gray-300">credit_card</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Expiry Date</label>
+                            <input type="text" placeholder="MM / YY"
+                                class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-2">CVV</label>
+                            <div class="relative">
+                                <input type="password" placeholder="***"
+                                    class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none font-mono">
+                                <span
+                                    class="absolute right-4 top-3.5 material-symbols-outlined text-gray-300 text-sm cursor-help"
+                                    title="3 digits on the back of your card">help</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Cardholder Name</label>
+                        <input type="text" placeholder="John Doe"
+                            class="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none font-medium">
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-primary hover:bg-secondary text-white font-bold py-4 rounded-full shadow-lg transition-all hover:-translate-y-1 mt-4 flex items-center justify-center gap-2">
+                        Pay Securely Now <span class="material-symbols-outlined">shield_check</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-accent/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="lg:pt-10">
+            <div class="bg-gray-50 rounded-[24px] p-8 border border-gray-100">
+                <h3 class="text-lg font-display font-bold text-text-dark mb-6">You're Paying</h3>
+                <div class="space-y-4 mb-8">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500 font-medium">Order Subtotal</span>
+                        <span class="text-sm font-bold text-text-dark">$145.80</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500 font-medium">Shipping</span>
+                        <span
+                            class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full uppercase tracking-tighter">Free</span>
+                    </div>
+                    <div class="h-px bg-gray-200 my-4"></div>
+                    <div class="flex justify-between items-end">
+                        <span class="text-lg font-display font-bold text-text-dark">Total Amount</span>
+                        <span class="text-3xl font-display font-bold text-primary">$145.80</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 opacity-50 justify-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa"
+                        class="h-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard"
+                        class="h-6">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="Paypal" class="h-4">
+                </div>
+            </div>
+
+            <p class="text-[10px] text-gray-400 mt-6 text-center italic px-4">
+                By clicking "Pay Securely Now", you authorize Cliq Mart to charge your card for the total amount. Your
+                card details are never stored on our servers.
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Dashboard - Cliq Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto py-10 px-4 sm:px-6 lg:px-8 min-h-[80vh]">
+
+    <div class="mb-10">
+        <h1 class="text-3xl md:text-4xl font-display font-bold text-text-dark">
+            Welcome back, <span class="text-primary">{{ user.first_name|default:user.username }}</span>!
+        </h1>
+        <p class="text-gray-500 mt-2 font-medium">Here's what's happening with your account today.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-white p-6 rounded-[24px] shadow-card border border-gray-50 flex items-center gap-5">
+            <div class="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+                <span class="material-symbols-outlined text-3xl">package_2</span>
+            </div>
+            <div>
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Active Orders</p>
+                <h3 class="text-2xl font-display font-bold text-text-dark">02</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-[24px] shadow-card border border-gray-50 flex items-center gap-5">
+            <div class="w-14 h-14 bg-accent/20 text-primary rounded-2xl flex items-center justify-center">
+                <span class="material-symbols-outlined text-3xl">favorite</span>
+            </div>
+            <div>
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Wishlist Items</p>
+                <h3 class="text-2xl font-display font-bold text-text-dark">12</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-[24px] shadow-card border border-gray-50 flex items-center gap-5">
+            <div class="w-14 h-14 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center">
+                <span class="material-symbols-outlined text-3xl">savings</span>
+            </div>
+            <div>
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Total Spent</p>
+                <h3 class="text-2xl font-display font-bold text-text-dark">$1,240.50</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div class="lg:col-span-2 bg-white rounded-[24px] shadow-card border border-gray-50 overflow-hidden">
+            <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                <h3 class="text-xl font-display font-bold text-text-dark">Recent Orders</h3>
+                <a href="/orders/" class="text-primary text-sm font-bold hover:underline">View All</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                        <tr>
+                            <th class="px-6 py-4">Order ID</th>
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                            <td class="px-6 py-4 font-bold text-primary text-sm">#CQ-99201</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">March 18, 2026</td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full uppercase">In
+                                    Transit</span>
+                            </td>
+                            <td class="px-6 py-4 font-bold text-text-dark">$299.00</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                            <td class="px-6 py-4 font-bold text-primary text-sm">#CQ-98115</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">March 10, 2026</td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded-full uppercase">Delivered</span>
+                            </td>
+                            <td class="px-6 py-4 font-bold text-text-dark">$45.50</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-primary rounded-[24px] p-8 text-white shadow-lg relative overflow-hidden">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-display font-bold mb-2">Need Help?</h3>
+                    <p class="text-sm text-gray-200 mb-6">Our support team is available 24/7 to assist with your orders.
+                    </p>
+                    <a href="/core/about/"
+                        class="inline-block bg-white text-primary font-bold px-6 py-3 rounded-full shadow-md hover:bg-accent transition-all">
+                        Contact Support
+                    </a>
+                </div>
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full"></div>
+            </div>
+
+            <div class="bg-white rounded-[24px] shadow-card border border-gray-50 p-6">
+                <h3 class="font-display font-bold text-text-dark mb-4 px-2">Quick Settings</h3>
+                <div class="space-y-2">
+                    <a href="/account/profile/"
+                        class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors text-gray-600 font-medium">
+                        <span class="material-symbols-outlined text-primary">manage_accounts</span> Edit Profile
+                    </a>
+                    <a href="/orders/cart/"
+                        class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors text-gray-600 font-medium">
+                        <span class="material-symbols-outlined text-primary">shopping_cart</span> View Cart
+                    </a>
+                    <a href="/account/logout/"
+                        class="flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition-colors text-red-500 font-medium">
+                        <span class="material-symbols-outlined">logout</span> Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

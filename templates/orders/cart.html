@@ -1,0 +1,271 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - Cliq Mart{% endblock %}
+
+{% block content %}
+<div class="max-w-[1480px] mx-auto px-4 py-10">
+    <div class="flex flex-col lg:flex-row gap-8">
+        <main class="flex-grow w-full">
+            <h1
+                class="text-3xl md:text-4xl font-black text-gray-900 mb-8 font-display tracking-tight flex items-center gap-4 animate-in fade-in slide-in-from-left-6 duration-700">
+                <div
+                    class="w-12 h-12 md:w-14 md:h-14 bg-primary rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary/20 shrink-0">
+                    <span class="material-symbols-outlined text-2xl md:text-3xl">shopping_cart</span>
+                </div>
+                Shopping Cart
+            </h1>
+
+            {% if items %}
+            <div
+                class="bg-white rounded-[2rem] shadow-sm border border-gray-200 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                <div
+                    class="hidden md:grid grid-cols-12 gap-8 bg-gray-50/80 px-8 py-5 border-b border-gray-100 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+                    <div class="col-span-6">Product Details</div>
+                    <div class="col-span-3 text-center">Quantity Control</div>
+                    <div class="col-span-2 text-right">Unit Price</div>
+                    <div class="col-span-1"></div>
+                </div>
+
+                <div class="divide-y divide-gray-100">
+                    {% for item in items %}
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 px-6 md:px-8 py-8 items-center group hover:bg-gray-50/40 transition-all duration-500">
+
+                        <div class="col-span-1 md:col-span-6 flex flex-col sm:flex-row gap-6">
+                            <div
+                                class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 bg-white rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0 p-3 shadow-sm group-hover:shadow-md transition-all duration-700 hover:-rotate-1">
+                                {% if item.product.images.first %}
+                                <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}"
+                                    class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700">
+                                {% else %}
+                                <div
+                                    class="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50 rounded-xl">
+                                    <span class="material-symbols-outlined text-4xl">inventory_2</span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="flex flex-col justify-center">
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span
+                                        class="px-3 py-1 bg-accent/20 text-primary text-[10px] font-black uppercase tracking-widest rounded-full">Organic</span>
+                                    <span
+                                        class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-widest rounded-full">In
+                                        Stock</span>
+                                </div>
+                                <a href="#"
+                                    class="text-xl md:text-2xl font-black text-gray-900 hover:text-primary transition-colors line-clamp-2 leading-tight tracking-tight underline-offset-4">{{ item.product.name }}</a>
+                                <p
+                                    class="text-xs font-medium text-gray-400 mt-2 flex items-center gap-1.5 uppercase tracking-tighter">
+                                    Sold by: <span class="text-primary font-black ml-1">{{ item.product.seller.get_full_name|default:item.product.seller.username }}</span>
+                                </p>
+
+                                <div
+                                    class="mt-4 flex md:hidden items-center justify-between bg-gray-50 rounded-2xl p-2 w-full border border-gray-100">
+                                    <span class="text-lg font-black text-gray-900 ml-2">${{ item.product.selling_price }}</span>
+                                    <div class="flex items-center bg-white rounded-xl shadow-sm border border-gray-100">
+                                        <form action="{% url 'orders:update_cart' item.id %}" method="POST" class="m-0">
+                                            {% csrf_token %}
+                                            <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}"
+                                                class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors"><span
+                                                    class="material-symbols-outlined text-lg">remove</span></button>
+                                        </form>
+                                        <span class="px-3 font-black text-base">{{ item.quantity }}</span>
+                                        <form action="{% url 'orders:update_cart' item.id %}" method="POST" class="m-0">
+                                            {% csrf_token %}
+                                            <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}"
+                                                class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors"><span
+                                                    class="material-symbols-outlined text-lg">add</span></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hidden md:col-span-3 md:flex justify-center">
+                            <div
+                                class="flex items-center bg-gray-50 rounded-2xl p-1.5 border border-gray-200 group-hover:bg-white transition-colors duration-500">
+                                <form action="{% url 'orders:update_cart' item.id %}" method="POST" class="m-0">
+                                    {% csrf_token %}
+                                    <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}"
+                                        class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-primary rounded-xl transition-all group/minus">
+                                        <span
+                                            class="material-symbols-outlined text-xl group-hover/minus:rotate-180 transition-transform duration-500">remove</span>
+                                    </button>
+                                </form>
+                                <span class="w-12 text-center text-lg font-black text-gray-900">{{ item.quantity }}</span>
+                                <form action="{% url 'orders:update_cart' item.id %}" method="POST" class="m-0">
+                                    {% csrf_token %}
+                                    <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}"
+                                        class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-primary rounded-xl transition-all group/plus">
+                                        <span
+                                            class="material-symbols-outlined text-xl group-hover/plus:rotate-90 transition-transform duration-500">add</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="hidden md:col-span-2 md:flex flex-col items-end">
+                            <span class="text-2xl font-black text-gray-900 tracking-tighter leading-none">${{ item.product.selling_price }}</span>
+                            <span class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mt-1">Unit
+                                Price</span>
+                        </div>
+
+                        <div class="hidden md:col-span-1 md:flex justify-end">
+                            <a href="{% url 'orders:remove_from_cart' item.id %}"
+                                class="w-12 h-12 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-300 group/del">
+                                <span
+                                    class="material-symbols-outlined text-2xl group-hover/del:scale-110 transition-transform">delete_outline</span>
+                            </a>
+                        </div>
+
+                        <div class="md:hidden flex justify-end w-full border-t border-gray-100 pt-4 mt-2">
+                            <a href="{% url 'orders:remove_from_cart' item.id %}"
+                                class="text-sm font-bold text-red-500 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-lg">delete_outline</span> Remove Item
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div
+                class="mt-8 flex flex-col md:flex-row items-center justify-between gap-6 px-4 animate-in fade-in duration-1000">
+                <a href="/products/"
+                    class="group flex items-center gap-3 text-primary font-black text-base hover:text-secondary transition-colors">
+                    <div
+                        class="w-10 h-10 rounded-full border-2 border-primary group-hover:border-secondary flex items-center justify-center group-hover:-translate-x-1 transition-all">
+                        <span class="material-symbols-outlined text-sm">west</span>
+                    </div>
+                    Continue Shopping
+                </a>
+
+                <div
+                    class="flex items-center gap-6 p-4 bg-white shadow-sm rounded-2xl border border-gray-200 w-full md:w-auto justify-center">
+                    <div class="flex flex-col text-right">
+                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Items</span>
+                        <span class="text-gray-900 font-black text-base">{{ items.count }}</span>
+                    </div>
+                    <div class="h-8 w-px bg-gray-200"></div>
+                    <div class="flex flex-col text-right">
+                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Subtotal</span>
+                        <span class="text-primary font-black text-xl tracking-tighter">${{ total }}</span>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div
+                class="bg-white rounded-[2rem] shadow-sm p-10 md:p-24 lg:p-32 text-center border border-gray-200 flex flex-col items-center animate-in fade-in zoom-in duration-1000">
+                <div
+                    class="w-32 h-32 bg-gray-50 rounded-3xl flex items-center justify-center mb-8 border-4 border-white shadow-lg">
+                    <span class="material-symbols-outlined text-6xl text-gray-300 animate-bounce">shopping_basket</span>
+                </div>
+                <h2 class="font-display text-3xl md:text-5xl font-black text-gray-900 tracking-tight">Your cart is empty
+                </h2>
+                <p class="text-gray-500 font-medium mt-4 max-w-md text-base md:text-lg leading-relaxed">It looks like
+                    you haven't added anything to your cart yet. Discover some amazing products today!</p>
+                <a href="/products/"
+                    class="mt-10 px-8 py-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/30 hover:bg-secondary hover:-translate-y-1 transition-all duration-300 text-lg flex items-center gap-3">
+                    <span class="material-symbols-outlined">explore</span>
+                    Browse Marketplace
+                </a>
+            </div>
+            {% endif %}
+        </main>
+
+        {% if items %}
+        <aside class="w-full lg:w-[400px] flex-shrink-0 animate-in fade-in slide-in-from-right-12 duration-1000">
+            <div class="sticky top-[100px] flex flex-col gap-6">
+
+                <div class="bg-primary rounded-[2rem] p-8 text-white shadow-xl relative overflow-hidden group">
+                    <div
+                        class="absolute -right-20 -bottom-20 w-64 h-64 bg-white/10 rounded-full blur-[60px] group-hover:scale-125 transition-transform duration-1000">
+                    </div>
+
+                    <h2 class="text-2xl font-black mb-8 font-display relative z-10 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                            <span class="material-symbols-outlined text-white text-xl">receipt_long</span>
+                        </div>
+                        Summary
+                    </h2>
+
+                    <div class="space-y-4 relative z-10">
+                        <div class="flex justify-between items-center text-white/80 font-semibold">
+                            <span>Subtotal</span>
+                            <span class="text-white font-black tracking-tight">${{ total }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-white/80 font-semibold">
+                            <span>Shipping</span>
+                            <span
+                                class="bg-accent text-primary px-3 py-0.5 rounded-full text-[10px] uppercase font-black tracking-widest">Free</span>
+                        </div>
+                        <div class="flex justify-between items-center text-white/80 font-semibold">
+                            <span>Taxes</span>
+                            <span class="text-white font-black tracking-tight">$0.00</span>
+                        </div>
+
+                        <div class="h-px bg-white/20 my-6"></div>
+
+                        <div class="flex justify-between items-end">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 mb-1">Total
+                                    Amount</span>
+                                <span class="text-5xl font-black tracking-tighter leading-none">${{ total }}</span>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'orders:checkout' %}"
+                            class="w-full mt-8 py-4 bg-accent text-primary font-black rounded-2xl shadow-lg hover:scale-[1.02] hover:brightness-105 active:scale-[0.98] transition-all text-lg flex items-center justify-center gap-3 group/btn block text-center">
+                            Proceed to Checkout
+                            <span
+                                class="material-symbols-outlined text-2xl group-hover:translate-x-2 transition-transform duration-300">arrow_right_alt</span>
+                        </a>
+
+                        <div
+                            class="mt-6 flex items-center justify-center gap-4 text-white/60 border-t border-white/10 pt-6">
+                            <div class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">lock</span>
+                                <span class="text-[8px] font-black uppercase tracking-wider">Secure</span>
+                            </div>
+                            <div class="w-1 h-1 bg-white/30 rounded-full"></div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px]">verified_user</span>
+                                <span class="text-[8px] font-black uppercase tracking-wider">Encrypted</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[2rem] p-6 border border-gray-200 shadow-sm">
+                    <div class="flex flex-col gap-4">
+                        <div class="relative w-full">
+                            <input type="text" placeholder="Promo code"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 text-sm font-bold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 pr-24 transition-all">
+                            <button
+                                class="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-5 bg-primary text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-secondary transition-colors">Apply</button>
+                        </div>
+
+                        <div class="flex items-start gap-4 p-4 rounded-xl bg-gray-50">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary shrink-0">
+                                <span class="material-symbols-outlined text-xl">verified</span>
+                            </div>
+                            <div class="flex flex-col pt-1">
+                                <span
+                                    class="text-xs font-black text-gray-900 uppercase tracking-widest leading-none mb-1">Cliq
+                                    Protection</span>
+                                <span class="text-[11px] font-medium text-gray-500 leading-tight">Free 30-day extended
+                                    returns and 100% money back guarantee.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

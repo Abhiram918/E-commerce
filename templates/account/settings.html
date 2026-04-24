@@ -1,0 +1,202 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Account Settings - Cliq Mart {% endblock %}
+
+{% block extra_css %}
+.sidebar-link {
+    transition: all 0.2s ease-in-out;
+}
+.sidebar-link:hover, .sidebar-link.active {
+    background-color: #F0F4F0;
+    color: #005F02;
+    font-weight: 600;
+}
+.sidebar-link.active {
+    border-left: 4px solid #005F02;
+}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+    <nav aria-label="Breadcrumb" class="flex text-sm text-gray-600 mb-6">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center hover:text-primary transition-colors" href="/">
+                    <span class="material-symbols-outlined text-sm mr-1">home</span>
+                    Home
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    {% if request.user.role == 'SELLER' %}
+                    <a class="ml-1 font-medium text-gray-900 hover:text-primary transition-colors md:ml-2" href="{% url 'account:profile' %}">Seller Central</a>
+                    {% else %}
+                    <a class="ml-1 font-medium text-gray-900 hover:text-primary transition-colors md:ml-2" href="{% url 'account:profile' %}">Your Account</a>
+                    {% endif %}
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    <span class="ml-1 font-medium text-gray-500 md:ml-2">{% if request.user.role == 'SELLER' %}Store Settings{% else %}Account Settings{% endif %}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    <div class="flex flex-col lg:flex-row gap-8">
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-[16px] shadow-sm overflow-hidden sticky top-24">
+
+                {% if request.user.role == 'SELLER' %}
+                <!-- ── Seller Sidebar ── -->
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">
+                            {{ request.user.sellerprofile.store_name|default:"S"|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">{{ request.user.sellerprofile.store_name|default:"Your Store" }}</h2>
+                            <p class="text-gray-200 text-sm">Seller ID: #{{ request.user.id }}</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="py-2">
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'account:profile' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">dashboard</span>
+                        Dashboard
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'products:seller_products' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">inventory_2</span>
+                        Inventory
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">local_shipping</span>
+                        Orders &amp; Shipping
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">campaign</span>
+                        Advertising
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">payments</span>
+                        Payments
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'products:add_product' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">post_add</span>
+                        Add Product
+                    </a>
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700"
+                       href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">store</span>
+                        Store Settings
+                    </a>
+                </nav>
+
+                {% else %}
+                <!-- ── Customer Sidebar ── -->
+                <div class="p-6 bg-primary text-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xl">{{ request.user.first_name|default:request.user.username|slice:":1"|upper }}</div>
+                        <div>
+                            <h2 class="font-display font-bold text-lg">Hello, {{ request.user.first_name|default:request.user.username }}</h2>
+                            <p class="text-xs text-gray-200">Member since {{ request.user.date_joined|date:"Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="py-2">
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:orders' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">shopping_bag</span>
+                        My Orders
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:wishlist' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">favorite</span>
+                        Wishlist
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:address_book' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">location_on</span>
+                        Address Book
+                    </a>
+                    <a class="sidebar-link active flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:settings' %}">
+                        <span class="material-symbols-outlined mr-3">manage_accounts</span>
+                        Account Settings
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="{% url 'account:reviews' %}">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">rate_review</span>
+                        My Reviews
+                    </a>
+                    <a class="sidebar-link flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-gray-50" href="#">
+                        <span class="material-symbols-outlined mr-3 text-gray-500">headset_mic</span>
+                        Customer Support
+                    </a>
+                </nav>
+                {% endif %}
+
+                <div class="p-4 border-t border-gray-100">
+                    <a href="{% url 'account:logout' %}" class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">logout</span>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </aside>
+        <div class="flex-1">
+            <h1 class="text-2xl font-display font-bold text-primary mb-6">Account Settings</h1>
+            
+            <div class="bg-white rounded-[12px] shadow-card border border-gray-100 p-6 sm:p-8">
+                <form class="space-y-6" action="{% url 'account:settings' %}" method="POST">
+                    {% csrf_token %}
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4">Personal Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                <input type="text" name="first_name" value="{{ request.user.first_name }}" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                <input type="text" name="last_name" value="{{ request.user.last_name }}" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary text-sm">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                <input type="email" name="email" value="{{ request.user.email }}" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary text-sm">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                <input type="text" name="phone" value="{{ request.user.phone|default:'' }}" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <h3 class="text-lg font-bold text-gray-900 border-b border-gray-200 pb-2 mb-4">Security</h3>
+                        <div class="mt-2 text-sm text-gray-700 flex justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div>
+                                <p class="font-medium">Password</p>
+                                <p class="text-gray-500 text-xs mt-1">Change your password to keep your account secure.</p>
+                            </div>
+                            <a href="{% url 'account:password_change' %}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+                                Change Password
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-4 gap-3">
+                        <button type="button" class="px-6 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-secondary transition-colors">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
