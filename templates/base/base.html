@@ -4,8 +4,8 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>{% block title %}Cliq Mart - Modern Marketplace{% endblock %}</title>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+  <title>{% block title %}SirCake - Premium Multi-Vendor Bakery{% endblock %}</title>
 
   <link href="https://fonts.googleapis.com" rel="preconnect" />
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
@@ -23,7 +23,7 @@
       theme: {
         extend: {
           colors: {
-            "primary": "#005F02",
+            "primary": "#005F02", // You can adjust these to fit the bakery aesthetic
             "secondary": "#427A43",
             "accent": "#C0B87A",
             "background-light": "#F9FAFB",
@@ -36,8 +36,10 @@
             "display": ["Montserrat", "sans-serif"]
           },
           boxShadow: {
-            'glass': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 2px 4px 0 rgba(255, 255, 255, 0.15)',
-            'card': '0 4px 20px rgba(0, 0, 0, 0.05)',
+            'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.05)',
+            'glass-inset': 'inset 0 0 0 1px rgba(255, 255, 255, 0.4)',
+            'bento': '0 4px 20px rgba(0, 0, 0, 0.03)',
+            'bento-hover': '0 10px 40px rgba(0, 0, 0, 0.08)',
           }
         },
       },
@@ -45,62 +47,109 @@
   </script>
 
   <style>
+    /* Responsive Scrollbar Hiding */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
-
     .no-scrollbar {
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
 
+    /* Premium Glassmorphism Utilities */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--tw-shadow-glass), var(--tw-shadow-glass-inset);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
     .glass-nav {
       background: rgba(66, 122, 67, 0.85);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .glass-btn {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Bento-box Global Layout Classes */
+    .bento-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
-
-    .glass-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    .card-gradient {
-      background: linear-gradient(180deg, #FFFFFF 0%, #FDFBF5 100%);
-    }
-
-    .hover-scale-img {
-      transition: transform 0.3s ease;
-    }
-
-    .hover-scale-img:hover {
-      transform: scale(1.05);
-    }
-
-    {% block extra_css %}
-
-    {% endblock %}
     
+    .bento-card {
+      background: #ffffff;
+      border-radius: 1.5rem;
+      box-shadow: var(--tw-shadow-bento);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(0,0,0,0.03);
+      overflow: hidden;
+    }
+
+    .bento-card:hover {
+      box-shadow: var(--tw-shadow-bento-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Smooth zooming for product images */
+    .hover-scale-img {
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .group:hover .hover-scale-img {
+      transform: scale(1.08);
+    }
+
+    /* Safe Area for iOS/Mobile Navbars */
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    {% block extra_css %}{% endblock %}
   </style>
 </head>
 
-<body class="bg-background-light text-text-dark font-sans antialiased overflow-x-hidden min-h-screen flex flex-col">
+<body class="bg-background-light text-text-dark font-sans antialiased overflow-x-hidden min-h-screen flex flex-col relative">
+
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] hidden opacity-0 transition-opacity duration-300" onclick="toggleMobileMenu()"></div>
 
   {% include 'base/navbar.html' %}
 
-  <main class="flex-grow w-full">
+  <main class="flex-grow w-full max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 py-6 w-full">
     {% block content %}
     {% endblock %}
   </main>
 
   {% include 'base/footer.html' %}
+
+  <script>
+    function toggleMobileMenu() {
+      const sidebar = document.getElementById('mobile-sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      const body = document.body;
+
+      if (!sidebar || !overlay) return;
+
+      const isHidden = sidebar.classList.contains('-translate-x-full');
+
+      if (isHidden) {
+        // Open Sidebar
+        overlay.classList.remove('hidden');
+        // Small delay to allow display:block to apply before animating opacity
+        setTimeout(() => overlay.classList.remove('opacity-0'), 10); 
+        sidebar.classList.remove('-translate-x-full');
+        body.classList.add('overflow-hidden'); // Prevent background scrolling
+      } else {
+        // Close Sidebar
+        overlay.classList.add('opacity-0');
+        sidebar.classList.add('-translate-x-full');
+        body.classList.remove('overflow-hidden');
+        // Wait for transition before hiding
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      }
+    }
+  </script>
 
   {% block extra_js %}{% endblock %}
 </body>

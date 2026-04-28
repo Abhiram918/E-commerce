@@ -1,52 +1,106 @@
-<footer class="bg-primary text-white mt-auto">
+<footer class="bg-primary text-white mt-auto relative overflow-hidden">
+    
+    <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+    <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-secondary/30 rounded-full blur-[80px] translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+
     <button
-        class="w-full bg-secondary hover:bg-[#346135] text-white text-sm py-4 font-bold text-center transition-colors"
+        class="w-full bg-secondary/80 backdrop-blur-md hover:bg-secondary text-white text-sm py-4 font-bold text-center transition-all flex items-center justify-center gap-2 group relative z-10 border-b border-white/10"
         onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <span class="material-symbols-outlined group-hover:-translate-y-1 transition-transform">keyboard_arrow_up</span>
         Back to top
     </button>
 
-    <div class="max-w-[1200px] mx-auto py-12 px-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+    <div class="max-w-screen-2xl mx-auto py-12 md:py-16 px-4 sm:px-6 md:px-8 relative z-10">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 mb-12">
 
-            <div class="flex flex-col gap-3">Cliq Mart
-                <h3 class="font-bold text-lg mb-2">Get to Know Us</h3>
-                <a class="text-sm text-gray-300 hover:text-white hover:underline transition-colors"
-                    href="/core/about/">About Cliq Mart</a>
-                <a class="text-sm text-gray-300 hover:text-white hover:underline transition-colors" href="#">Careers</a>
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-2 text-accent mb-2">
+                    <span class="material-symbols-outlined">info</span>
+                    <h3 class="font-bold text-lg tracking-wide">Get to Know Us</h3>
+                </div>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="/core/about/">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> About SirCake
+                </a>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="#">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> Careers
+                </a>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="#">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> Press Releases
+                </a>
             </div>
 
-            <div class="flex flex-col gap-3">
-                <h3 class="font-bold text-lg mb-2">Make Money with Us</h3>
-                <a class="text-sm text-gray-300 hover:text-white hover:underline transition-colors"
-                    href="/account/register/">Sell on Cliq</a>
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-2 text-accent mb-2">
+                    <span class="material-symbols-outlined">storefront</span>
+                    <h3 class="font-bold text-lg tracking-wide">Partner with Us</h3>
+                </div>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="{% url 'account:seller_register' %}">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> Become a Baker
+                </a>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="#">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> Seller Dashboard
+                </a>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="#">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> Affiliate Program
+                </a>
             </div>
 
-            <div class="flex flex-col gap-3">
-                <h3 class="font-bold text-lg mb-2">Payment Products</h3>
-                <a class="text-sm text-gray-300 hover:text-white hover:underline transition-colors" href="#">Shop with
-                    Points</a>
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-2 text-accent mb-2">
+                    <span class="material-symbols-outlined">payments</span>
+                    <h3 class="font-bold text-lg tracking-wide">Payments</h3>
+                </div>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="#">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> Secure Checkout
+                </a>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="#">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> SirCake Wallet
+                </a>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="#">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> Refund Policy
+                </a>
             </div>
 
-            <div class="flex flex-col gap-3">
-                <h3 class="font-bold text-lg mb-2">Let Us Help You</h3>
-                <a class="text-sm text-gray-300 hover:text-white hover:underline transition-colors"
-                    href="/account/profile/">Your Account</a>
-                <a class="text-sm text-gray-300 hover:text-white hover:underline transition-colors" href="/orders/">Your
-                    Orders</a>
-                <a class="text-sm text-gray-300 hover:text-white hover:underline transition-colors" href="#">Help</a>
-            </div>Cliq Mart
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-2 text-accent mb-2">
+                    <span class="material-symbols-outlined">help_center</span>
+                    <h3 class="font-bold text-lg tracking-wide">Let Us Help You</h3>
+                </div>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="/account/profile/">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> Your Account
+                </a>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="/orders/">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> Track Orders
+                </a>
+                <a class="text-sm text-gray-300 hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2" href="#">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/30"></span> 24/7 Support
+                </a>
+            </div>
 
         </div>
 
-        <div class="border-t border-white/10 pt-8 flex flex-col items-center gap-6">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-3xl">storefront</span>
-                <h2 class="text-2xl font-display font-bold tracking-tight">Cliq Mart</h2>
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-8"></div>
+
+        <div class="flex flex-col items-center gap-6 pb-safe">
+            
+            <a href="/" class="flex items-center gap-2 group cursor-pointer">
+                <div class="bg-white/10 p-2 rounded-xl backdrop-blur-sm group-hover:bg-white/20 transition-all border border-white/10">
+                    <span class="material-symbols-outlined text-3xl text-accent">cake</span>
+                </div>
+                <h2 class="text-3xl font-display font-bold tracking-tight text-white">Sir<span class="font-light text-accent">Cake</span></h2>
+            </a>
+
+            <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 text-xs text-gray-400">
+                <a class="hover:text-accent transition-colors" href="#">Conditions of Use</a>
+                <span class="hidden sm:inline w-1 h-1 rounded-full bg-gray-600"></span>
+                <a class="hover:text-accent transition-colors" href="#">Privacy Notice</a>
+                <span class="hidden sm:inline w-1 h-1 rounded-full bg-gray-600"></span>
+                <a class="hover:text-accent transition-colors" href="#">Cookie Policy</a>
             </div>
-            <div class="flex flex-col md:flex-row justify-center items-center gap-6 text-xs text-gray-400 mt-4">
-                <a class="hover:underline hover:text-white transition-colors" href="#">Conditions of Use</a>
-                <a class="hover:underline hover:text-white transition-colors" href="#">Privacy Notice</a>
-                <span class="mt-2 md:mt-0">© 1996-{% now "Y" %}, CliqMarket.com</span>
+            
+            <div class="text-xs text-gray-500 mt-2 font-medium">
+                © {% now "Y" %}, SirCake.com. Built with <span class="text-accent">&hearts;</span>
             </div>
         </div>
     </div>
