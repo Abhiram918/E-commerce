@@ -11,7 +11,7 @@
                 <div class="bg-white/20 p-1.5 rounded-xl backdrop-blur-sm group-hover:bg-white/30 transition-all shadow-inner">
                     <span class="material-symbols-outlined text-2xl md:text-3xl">storefront</span>
                 </div>
-                <h1 class="font-display text-xl md:text-2xl font-bold tracking-tight leading-none drop-shadow-md">Sir<span class="font-light text-accent">Cake</span></h1>
+                <h1 class="font-display text-xl md:text-2xl font-bold tracking-tight leading-none drop-shadow-md">Cliq<span class="font-light text-accent">Market</span></h1>
             </a>
         </div>
 
@@ -28,7 +28,7 @@
                 All <span class="material-symbols-outlined text-xs ml-1">arrow_drop_down</span>
             </button>
             <input class="flex-1 px-4 text-gray-800 text-sm md:text-base border-none focus:ring-0 placeholder-gray-400 bg-transparent"
-                placeholder="Search for cakes, pastries, sellers..." type="text" name="q" value="{{ request.GET.q|default:'' }}" />
+                placeholder="Search for products..." type="text" name="q" value="{{ request.GET.q|default:'' }}" />
             <button type="submit" class="bg-accent hover:bg-[#a8a065] px-6 flex items-center justify-center text-primary transition-colors">
                 <span class="material-symbols-outlined text-xl font-bold">search</span>
             </button>
@@ -73,13 +73,6 @@
                         </a>
                         {% endif %}
                         
-                        {% if request.user.role == 'ADMIN' %}
-                        <div class="h-px bg-gray-100 my-2 mx-2"></div>
-                        <a href="{% url 'account:admin_dashboard' %}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-primary hover:bg-primary/10 rounded-xl transition-colors">
-                            <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Admin Dashboard
-                        </a>
-                        {% endif %}
-                        
                         <div class="h-px bg-gray-100 my-2 mx-2"></div>
                         <a href="{% url 'account:logout' %}" class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors">
                             <span class="material-symbols-outlined text-[20px]">logout</span> Logout
@@ -106,7 +99,7 @@
         </div>
     </div>
 
-    <div class="hidden lg:flex bg-black/10 border-t border-white/10" id="category-nav">
+    <div class="bg-black/10 border-t border-white/10 w-full" id="category-nav">
         <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar w-full">
             <a href="/products/" class="text-sm font-medium hover:bg-white/20 hover:shadow-glass px-4 py-1.5 rounded-full transition-all whitespace-nowrap">Shop All</a>
 
@@ -145,23 +138,17 @@
 </header>
 
 <div id="mobile-sidebar" class="fixed inset-y-0 left-0 w-[280px] bg-white/95 backdrop-blur-2xl z-[120] transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col h-full border-r border-white/40">
-    
     <div class="bg-primary text-white p-6 rounded-br-[40px] shadow-glass relative">
         <button type="button" onclick="toggleMobileMenu()" class="absolute top-4 right-4 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors">
             <span class="material-symbols-outlined text-white">close</span>
         </button>
-        
         <div class="flex items-center gap-3 mb-2">
             <div class="bg-white/20 p-2 rounded-2xl backdrop-blur-sm">
                 <span class="material-symbols-outlined text-3xl">account_circle</span>
             </div>
             <div>
                 <h2 class="font-bold text-lg leading-tight">
-                    {% if request.user.is_authenticated %}
-                        Hello, {{ request.user.first_name|default:request.user.username }}
-                    {% else %}
-                        Hello, Sign In
-                    {% endif %}
+                    {% if request.user.is_authenticated %}Hello, {{ request.user.first_name|default:request.user.username }}{% else %}Hello, Sign In{% endif %}
                 </h2>
                 {% if not request.user.is_authenticated %}
                 <a href="{% url 'account:login' %}" class="text-accent text-sm font-medium hover:underline">Login / Register</a>
@@ -169,30 +156,8 @@
             </div>
         </div>
     </div>
-
     <div class="flex-1 overflow-y-auto p-4 space-y-6">
-        
-        <div>
-            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2">Categories</h3>
-            <div class="space-y-1">
-                <a href="/products/" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-50 text-gray-800 font-medium transition-colors">
-                    Shop All
-                </a>
-                {% for cat in nav_categories %}
-                <div class="mobile-cat-group">
-                    <a href="/products/?category={{ cat.slug }}" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-50 text-gray-800 font-medium transition-colors">
-                        {{ cat.name }}
-                        {% if cat.subcategories.all %}
-                        <span class="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
-                        {% endif %}
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
         {% if request.user.is_authenticated %}
-        <div class="h-px bg-gray-100 mx-2"></div>
         <div>
             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2">My Account</h3>
             <div class="space-y-1">
@@ -213,7 +178,6 @@
             </div>
         </div>
         {% endif %}
-
         <div class="h-px bg-gray-100 mx-2"></div>
         <div class="pb-safe">
             {% if request.user.role != 'SELLER' and request.user.role != 'ADMIN' %}
@@ -221,7 +185,6 @@
                 <span class="material-symbols-outlined text-[20px]">store</span> Become a Seller
             </a>
             {% endif %}
-            
             {% if request.user.is_authenticated %}
             <a href="{% url 'account:logout' %}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-red-600 font-medium transition-colors">
                 <span class="material-symbols-outlined">logout</span> Sign Out
@@ -236,16 +199,12 @@
     var activeSlug = null;
     var hideTimer = null;
 
-    function getDropdown(slug) {
-        return document.getElementById('cat-drop-' + slug);
-    }
-
+    function getDropdown(slug) { return document.getElementById('cat-drop-' + slug); }
     function positionDropdown(triggerEl, drop) {
         var header = document.getElementById('category-nav');
         if (!header) return;
         var headerRect = header.getBoundingClientRect();
         var triggerRect = triggerEl.getBoundingClientRect();
-        
         var left = triggerRect.left - headerRect.left;
         var maxLeft = headerRect.width - drop.offsetWidth - 16;
         drop.style.left = Math.max(16, Math.min(left, maxLeft)) + 'px';
@@ -274,15 +233,9 @@
         }, 150);
     };
 
-    window.catDropdownKeep = function (dropEl) {
-        clearTimeout(hideTimer);
-    };
-
+    window.catDropdownKeep = function (dropEl) { clearTimeout(hideTimer); };
     window.catDropdownHide2 = function (dropEl) {
-        hideTimer = setTimeout(function () {
-            dropEl.classList.add('hidden');
-            activeSlug = null;
-        }, 150);
+        hideTimer = setTimeout(function () { dropEl.classList.add('hidden'); activeSlug = null; }, 150);
     };
 })();
 </script>
