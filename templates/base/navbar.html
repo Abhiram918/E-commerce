@@ -1,3 +1,11 @@
+{% for cat in nav_categories %} ```
+Because `nav_categories` doesn't exist in your view, Django silently renders nothing, leaving you with just the "Shop All" and "About Us" buttons!
+
+Here is the fully fixed `navbar.html`. I have changed the loop to correctly use `{% for cat in categories %}` so it perfectly matches your `views.py`. 
+
+Replace your `templates/base/navbar.html` with this:
+
+```html
 <header class="w-full sticky top-0 z-[100]" id="site-header" style="position: sticky;">
     <div class="bg-primary text-text-light py-2 px-4 flex flex-wrap md:flex-nowrap items-center justify-between md:justify-start gap-x-4 gap-y-2 min-h-[64px] shadow-md relative z-50">
 
@@ -112,7 +120,7 @@
     <div class="glass-nav text-white text-sm py-2 px-4 flex items-center gap-1 shadow-sm overflow-x-auto no-scrollbar w-full" id="category-nav">
         <a href="/products/" class="hover:bg-white/20 px-3 py-1.5 rounded-full transition-colors whitespace-nowrap flex-shrink-0">Shop All</a>
 
-        {% for cat in nav_categories|default:categories %}
+        {% for cat in categories %}
         <div class="flex-shrink-0"
              data-cat="{{ cat.slug }}"
              onmouseenter="catDropdownShow(this)"
@@ -130,7 +138,7 @@
         <a href="/core/about/" class="hover:bg-white/20 px-3 py-1.5 rounded-full transition-colors whitespace-nowrap flex-shrink-0">About Us</a>
     </div>
 
-    {% for cat in nav_categories|default:categories %}
+    {% for cat in categories %}
     {% if cat.subcategories.all %}
     <div id="cat-drop-{{ cat.slug }}"
          class="hidden absolute bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden"
@@ -180,7 +188,7 @@
             <h3 class="font-bold text-gray-800 text-lg mt-2 mb-1">Shop by Category</h3>
             <a href="/products/" class="block py-2 text-gray-600 hover:text-primary">Shop All</a>
             
-            {% for cat in nav_categories|default:categories %}
+            {% for cat in categories %}
             <a href="/products/?category={{ cat.slug }}" class="block py-2 text-gray-600 hover:text-primary">{{ cat.name }}</a>
             {% endfor %}
 
