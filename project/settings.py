@@ -17,7 +17,15 @@ import pymysql
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv()
+env_path = BASE_DIR / '.env'
+if not env_path.exists():
+    env_path = BASE_DIR.parent / '.env'
+if env_path.exists():
+    load_dotenv(env_path, override=True)
+else:
+    raise RuntimeError(
+        f"Missing .env file at {BASE_DIR / '.env'} or {BASE_DIR.parent / '.env'}"
+    )
 
 pymysql.install_as_MySQLdb()
 
