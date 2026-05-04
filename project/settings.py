@@ -16,14 +16,8 @@ import pymysql
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-env_path = BASE_DIR / '.env'
-if not env_path.exists():
-    env_path = BASE_DIR.parent / '.env'
-if not env_path.exists():
-    raise RuntimeError(
-        f"Could not find .env file at {BASE_DIR / '.env'} or {BASE_DIR.parent / '.env'}"
-    )
-load_dotenv(env_path, override=True)
+
+load_dotenv()
 
 pymysql.install_as_MySQLdb()
 
@@ -37,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
 
 
 # Application definition
