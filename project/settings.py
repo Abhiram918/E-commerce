@@ -10,14 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
-from dotenv import load_dotenv
-load_dotenv()
 from pathlib import Path
+from dotenv import load_dotenv
 import pymysql
-pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env_path = BASE_DIR / '.env'
+if not env_path.exists():
+    env_path = BASE_DIR.parent / '.env'
+load_dotenv(env_path)
+
+pymysql.install_as_MySQLdb()
 
 
 # Quick-start development settings - unsuitable for production
@@ -62,7 +66,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'project.urls'
 
-ENVIRONMENT= os.getenv('ENVIRONMENT')
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
