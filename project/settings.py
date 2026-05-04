@@ -19,7 +19,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env_path = BASE_DIR / '.env'
 if not env_path.exists():
     env_path = BASE_DIR.parent / '.env'
-load_dotenv(env_path)
+if not env_path.exists():
+    raise RuntimeError(
+        f"Could not find .env file at {BASE_DIR / '.env'} or {BASE_DIR.parent / '.env'}"
+    )
+load_dotenv(env_path, override=True)
 
 pymysql.install_as_MySQLdb()
 
