@@ -182,9 +182,6 @@ AUTH_USER_MODEL = 'account.User'
 LOGIN_REDIRECT_URL = 'core:home'
 LOGOUT_REDIRECT_URL = 'account:login'
 
-
-
-
 # Email Settings for Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
